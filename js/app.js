@@ -4,9 +4,7 @@
 ========================================== */
 
 import {
-  loadAllData,
-  buildCalendar,
-  getLatestMonth
+  loadAllData
 } from "./core/dataLoader.js";
 
 import {
@@ -18,20 +16,24 @@ import {
 } from "./core/lookupBuilder.js";
 
 import {
+  getLatestMonth
+} from "./core/dateUtils.js";
+
+import {
   initializeFilters,
   subscribe
 } from "./core/filterStore.js";
-
-import {
-  buildFilterOptions,
-  renderFilters
-} from "./components/filters.js";
 
 import {
   renderHeader,
   renderSummaryBar,
   getTotalRecords
 } from "./components/header.js";
+
+import {
+  renderFilters,
+  buildFilterOptions
+} from "./components/filters.js";
 
 import {
   renderTabs,
@@ -52,13 +54,11 @@ import {
    APP STATE
 ========================================== */
 
-let CALENDAR = [];
-
 let CURRENT_REPORT =
   "dashboard";
 
 /* ==========================================
-   START APP
+   INIT
 ========================================== */
 
 document.addEventListener(
@@ -67,7 +67,7 @@ document.addEventListener(
 );
 
 /* ==========================================
-   INITIALIZE
+   APP START
 ========================================== */
 
 async function initializeApp() {
@@ -75,14 +75,14 @@ async function initializeApp() {
   try {
 
     showFullScreenLoader(
-      "Loading Data..."
+      "Loading Application..."
     );
 
     renderHeader();
 
-    /* ==========================
+    /* ======================
        LOAD DATA
-    ========================== */
+    ====================== */
 
     updateLoaderMessage(
       "Loading Google Sheets..."
@@ -90,9 +90,9 @@ async function initializeApp() {
 
     await loadAllData();
 
-    /* ==========================
+    /* ======================
        LOOKUPS
-    ========================== */
+    ====================== */
 
     updateLoaderMessage(
       "Building Lookups..."
@@ -100,57 +100,46 @@ async function initializeApp() {
 
     buildLookups();
 
-    /* ==========================
-       CALENDAR
-    ========================== */
+    /* ======================
+       SALES
+    ====================== */
 
-    updateLoaderMessage(
-      "Preparing Calendar..."
-    );
+    const sales =
+      getAppData(
+        "sales"
+      ) || [];
 
-    CALENDAR =
-      buildCalendar(
-
-        getAppData(
-          "sales"
-        ),
-
-        getAppData(
-          "returns"
-        ),
-
-        getAppData(
-          "productMaster"
-        )
-
-      );
+    /* ======================
+       LATEST MONTH
+    ====================== */
 
     const latestMonth =
       getLatestMonth(
-        CALENDAR
+        sales
       );
 
     initializeFilters(
       latestMonth
+        ?.monthKey
     );
 
-    /* ==========================
+    /* ======================
        FILTERS
-    ========================== */
+    ====================== */
 
     renderGlobalFilters();
 
-    /* ==========================
-       SUMMARY
-    ========================== */
+    /* ======================
+       HEADER SUMMARY
+    ====================== */
 
     renderAppSummary(
       latestMonth
     );
 
-    /* ==========================
+    /* ======================
        TABS
-    ========================== */
+    ====================== */
 
     renderTabs();
 
@@ -158,9 +147,9 @@ async function initializeApp() {
       loadReport
     );
 
-    /* ==========================
-       FILTER SUBSCRIPTION
-    ========================== */
+    /* ======================
+       FILTER EVENTS
+    ====================== */
 
     subscribe(
       () => {
@@ -172,9 +161,9 @@ async function initializeApp() {
       }
     );
 
-    /* ==========================
-       INITIAL REPORT
-    ========================== */
+    /* ======================
+       LOAD DASHBOARD
+    ====================== */
 
     updateLoaderMessage(
       "Loading Dashboard..."
@@ -194,11 +183,16 @@ async function initializeApp() {
 
     hideFullScreenLoader();
 
-    document
-      .getElementById(
+    const container =
+      document.getElementById(
         "report-container"
-      )
-      .innerHTML = `
+      );
+
+    if (
+      container
+    ) {
+
+      container.innerHTML = `
 
         <div class="empty-state">
 
@@ -218,6 +212,8 @@ async function initializeApp() {
 
       `;
 
+    }
+
   }
 
 }
@@ -228,21 +224,22 @@ async function initializeApp() {
 
 function renderGlobalFilters() {
 
+  const sales =
+    getAppData(
+      "sales"
+    ) || [];
+
+  const productMaster =
+    getAppData(
+      "productMaster"
+    ) || [];
+
   const filterOptions =
     buildFilterOptions({
 
-      calendar:
-        CALENDAR,
+      sales,
 
-      sales:
-        getAppData(
-          "sales"
-        ),
-
-      productMaster:
-        getAppData(
-          "productMaster"
-        )
+      productMaster
 
     });
 
@@ -253,7 +250,7 @@ function renderGlobalFilters() {
 }
 
 /* ==========================================
-   SUMMARY
+   SUMMARY BAR
 ========================================== */
 
 function renderAppSummary(
@@ -265,31 +262,22 @@ function renderAppSummary(
       "sales"
     ) || [];
 
-  let latestDate = "-";
-
-  if (
-    sales.length
-  ) {
-
-    latestDate =
-      sales
-        .map(
-          row =>
-            row.date
-        )
-        .filter(Boolean)
-        .sort()
-        .at(-1) || "-";
-
-  }
+  const latestDate =
+    sales
+      .map(
+        row =>
+          row.date
+      )
+      .filter(Boolean)
+      .sort()
+      .at(-1) || "-";
 
   renderSummaryBar({
 
     selectedMonth:
-
       latestMonth
-        ? `${latestMonth.month}-${latestMonth.year}`
-        : "-",
+        ?.monthLabel ||
+      "-",
 
     recordsLoaded:
       getTotalRecords(),
@@ -301,7 +289,7 @@ function renderAppSummary(
 }
 
 /* ==========================================
-   REPORT LOADER
+   LOAD REPORT
 ========================================== */
 
 async function loadReport(
@@ -323,18 +311,18 @@ async function loadReport(
     ) {
 
       throw new Error(
-        `Unknown Report: ${reportId}`
+        `Report not found: ${reportId}`
       );
 
     }
 
-    const binderModule =
+    const module =
       await import(
         report.binder
       );
 
     if (
-      typeof binderModule.render !==
+      typeof module.render !==
       "function"
     ) {
 
@@ -344,7 +332,7 @@ async function loadReport(
 
     }
 
-    await binderModule.render();
+    await module.render();
 
   } catch (error) {
 
@@ -352,11 +340,16 @@ async function loadReport(
       error
     );
 
-    document
-      .getElementById(
+    const container =
+      document.getElementById(
         "report-container"
-      )
-      .innerHTML = `
+      );
+
+    if (
+      container
+    ) {
+
+      container.innerHTML = `
 
         <div class="empty-state">
 
@@ -375,6 +368,8 @@ async function loadReport(
         </div>
 
       `;
+
+    }
 
   }
 
