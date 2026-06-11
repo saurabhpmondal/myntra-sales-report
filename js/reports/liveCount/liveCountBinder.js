@@ -1,0 +1,1 @@
+// liveCountBinder.js
