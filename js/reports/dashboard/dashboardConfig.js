@@ -1,6 +1,5 @@
 /* ==========================================
    DASHBOARD CONFIG
-   Myntra Sales Intelligence
 ========================================== */
 
 export const DASHBOARD_CONFIG = {
@@ -10,7 +9,7 @@ export const DASHBOARD_CONFIG = {
   title: "Dashboard",
 
   description:
-    "Sales, Stock & Performance Overview"
+    "Sales & Business Overview"
 
 };
 
@@ -22,117 +21,58 @@ export const KPI_CARDS = [
 
   {
     id: "gmv",
-    title: "GMV",
-    type: "GMV"
+    title: "GMV"
   },
 
   {
     id: "units",
-    title: "TOTAL UNITS",
-    type: "UNITS"
+    title: "TOTAL UNITS"
   },
 
   {
     id: "asp",
-    title: "ASP",
-    type: "ASP"
+    title: "ASP"
   },
 
   {
     id: "sjitStock",
-    title: "SJIT STOCK",
-    type: "UNITS"
+    title: "SJIT STOCK"
   },
 
   {
     id: "sorStock",
-    title: "SOR STOCK",
-    type: "UNITS"
+    title: "SOR STOCK"
   }
 
 ];
 
 /* ==========================================
-   CHART CONFIG
+   TABLE COLUMNS
 ========================================== */
 
-export const CHARTS = {
+export const ERP_STATUS_COLUMNS = [
 
-  dailyUnitsTrend: {
-
-    id: "daily-units-trend",
-
-    title: "Daily Units Trend",
-
-    type: "line"
-
+  {
+    key: "status",
+    label: "ERP Status"
   },
 
-  dailyBrandTrend: {
-
-    id: "daily-brand-trend",
-
-    title: "Daily Brand Wise Sales",
-
-    type: "stacked-bar"
-
+  {
+    key: "units",
+    label: "Units"
   },
 
-  poTypePerformance: {
+  {
+    key: "gmv",
+    label: "GMV"
+  },
 
-    id: "po-type-performance",
-
-    title: "PO Type Performance",
-
-    type: "donut"
-
+  {
+    key: "share",
+    label: "Share %"
   }
 
-};
-
-/* ==========================================
-   TABLE CONFIG
-========================================== */
-
-export const TABLES = {
-
-  brandProjection: {
-
-    id: "brand-projection",
-
-    title: "Brand Projection"
-
-  },
-
-  poTypeProjection: {
-
-    id: "po-type-projection",
-
-    title: "PO Type Projection"
-
-  },
-
-  statusPerformance: {
-
-    id: "status-performance",
-
-    title: "Status Performance"
-
-  },
-
-  brandPerformance: {
-
-    id: "brand-performance",
-
-    title: "Brand Performance"
-
-  }
-
-};
-
-/* ==========================================
-   BRAND PERFORMANCE COLUMNS
-========================================== */
+];
 
 export const BRAND_COLUMNS = [
 
@@ -163,15 +103,11 @@ export const BRAND_COLUMNS = [
 
 ];
 
-/* ==========================================
-   STATUS PERFORMANCE COLUMNS
-========================================== */
-
-export const STATUS_COLUMNS = [
+export const PO_TYPE_COLUMNS = [
 
   {
-    key: "status",
-    label: "ERP Status"
+    key: "poType",
+    label: "PO Type"
   },
 
   {
@@ -187,39 +123,6 @@ export const STATUS_COLUMNS = [
   {
     key: "share",
     label: "Share %"
-  }
-
-];
-
-/* ==========================================
-   PROJECTION COLUMNS
-========================================== */
-
-export const PROJECTION_COLUMNS = [
-
-  {
-    key: "name",
-    label: "Name"
-  },
-
-  {
-    key: "currentMonthUnits",
-    label: "Current Month Units"
-  },
-
-  {
-    key: "previousMonthUnits",
-    label: "Previous Month Units"
-  },
-
-  {
-    key: "growth",
-    label: "Growth %"
-  },
-
-  {
-    key: "projectedMonthEnd",
-    label: "Projected Month End"
   }
 
 ];
