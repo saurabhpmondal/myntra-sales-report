@@ -4,123 +4,76 @@
 ========================================== */
 
 import {
-  setHTML
+  appendHTML,
+  qs
 } from "../core/dom.js";
 
 /* ==========================================
-   SHOW PAGE LOADER
+   CONSTANTS
 ========================================== */
 
-export function showLoader(
-  containerId,
-  message = "Loading..."
-) {
-
-  const html = `
-
-    <div class="loader-wrapper">
-
-      <div class="loader"></div>
-
-      <div class="loader-text">
-
-        ${message}
-
-      </div>
-
-    </div>
-
-  `;
-
-  setHTML(
-    containerId,
-    html
-  );
-
-}
+const LOADER_ID =
+  "global-loader";
 
 /* ==========================================
-   SHOW FULL SCREEN LOADER
+   SHOW LOADER
 ========================================== */
 
 export function showFullScreenLoader(
-  message = "Loading Application..."
+  message = "Loading..."
 ) {
 
-  const existing =
+  let loader =
     document.getElementById(
-      "global-loader"
+      LOADER_ID
     );
 
-  if (existing) {
+  if (!loader) {
+
+    appendHTML(
+      document.body,
+      buildLoaderHTML(
+        message
+      )
+    );
+
     return;
+
   }
 
-  const loader =
-    document.createElement(
-      "div"
-    );
+  loader.style.display =
+    "flex";
 
-  loader.id =
-    "global-loader";
-
-  loader.innerHTML = `
-
-    <div class="loader-overlay">
-
-      <div class="loader-card">
-
-        <div class="loader"></div>
-
-        <div class="loader-title">
-
-          Myntra Sales Intelligence
-
-        </div>
-
-        <div class="loader-subtitle">
-
-          ${message}
-
-        </div>
-
-      </div>
-
-    </div>
-
-  `;
-
-  document.body.appendChild(
-    loader
+  updateLoaderMessage(
+    message
   );
 
 }
 
 /* ==========================================
-   HIDE FULL SCREEN LOADER
+   HIDE LOADER
 ========================================== */
 
 export function hideFullScreenLoader() {
 
   const loader =
     document.getElementById(
-      "global-loader"
+      LOADER_ID
     );
 
-  if (
-    !loader
-  ) {
+  if (!loader) {
 
     return;
 
   }
 
-  loader.remove();
+  loader.style.display =
+    "none";
 
 }
 
 /* ==========================================
-   UPDATE LOADER MESSAGE
+   UPDATE MESSAGE
 ========================================== */
 
 export function updateLoaderMessage(
@@ -128,13 +81,11 @@ export function updateLoaderMessage(
 ) {
 
   const element =
-    document.querySelector(
-      "#global-loader .loader-subtitle"
+    document.getElementById(
+      "loader-message"
     );
 
-  if (
-    !element
-  ) {
+  if (!element) {
 
     return;
 
@@ -146,22 +97,32 @@ export function updateLoaderMessage(
 }
 
 /* ==========================================
-   BUILD LOADER HTML
+   BUILD HTML
 ========================================== */
 
-export function buildLoader(
-  message = "Loading..."
+function buildLoaderHTML(
+  message
 ) {
 
   return `
 
-    <div class="loader-wrapper">
+    <div
+      id="${LOADER_ID}"
+      class="fullscreen-loader"
+    >
 
-      <div class="loader"></div>
+      <div class="loader-content">
 
-      <div class="loader-text">
+        <div class="loader-spinner"></div>
 
-        ${message}
+        <div
+          id="loader-message"
+          class="loader-message"
+        >
+
+          ${message}
+
+        </div>
 
       </div>
 
