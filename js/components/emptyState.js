@@ -12,62 +12,31 @@ import {
 ========================================== */
 
 export function renderEmptyState(
-  containerId,
+  selector,
   {
     title = "No Data Available",
-    subtitle = "Try changing filters or refresh the data.",
+    subtitle = "No records found for selected filters.",
     icon = "📭"
   } = {}
 ) {
 
-  const html = buildEmptyState({
-    title,
-    subtitle,
-    icon
-  });
-
-  setHTML(
-    containerId,
-    html
-  );
-
-}
-
-/* ==========================================
-   BUILD EMPTY STATE
-========================================== */
-
-export function buildEmptyState(
-  {
-    title = "No Data Available",
-    subtitle = "Try changing filters or refresh the data.",
-    icon = "📭"
-  } = {}
-) {
-
-  return `
+  const html = `
 
     <div class="empty-state">
 
-      <div
-        class="empty-state-icon"
-      >
+      <div class="empty-state-icon">
 
         ${icon}
 
       </div>
 
-      <div
-        class="empty-state-title"
-      >
+      <div class="empty-state-title">
 
         ${title}
 
       </div>
 
-      <div
-        class="empty-state-subtitle"
-      >
+      <div class="empty-state-subtitle">
 
         ${subtitle}
 
@@ -77,68 +46,63 @@ export function buildEmptyState(
 
   `;
 
+  setHTML(
+    selector,
+    html
+  );
+
 }
 
 /* ==========================================
-   REPORT EMPTY STATE
+   REPORT ERROR
 ========================================== */
 
-export function buildReportEmptyState(
-  reportName = "Report"
+export function renderErrorState(
+  selector,
+  error
 ) {
 
-  return buildEmptyState({
+  renderEmptyState(
+    selector,
+    {
 
-    icon: "📊",
+      icon: "⚠️",
 
-    title:
-      `No ${reportName} Data Found`,
+      title:
+        "Something Went Wrong",
 
-    subtitle:
-      "Current filters returned no records."
+      subtitle:
+        error?.message ||
+        "Unexpected error occurred."
 
-  });
-
-}
-
-/* ==========================================
-   FILTER EMPTY STATE
-========================================== */
-
-export function buildFilterEmptyState() {
-
-  return buildEmptyState({
-
-    icon: "🔍",
-
-    title:
-      "No Matching Records",
-
-    subtitle:
-      "Try broadening the selected filters."
-
-  });
+    }
+  );
 
 }
 
 /* ==========================================
-   ERROR EMPTY STATE
+   NO DATA
 ========================================== */
 
-export function buildErrorState(
-  message = "Something went wrong."
+export function renderNoData(
+  selector,
+  message =
+    "No records found."
 ) {
 
-  return buildEmptyState({
+  renderEmptyState(
+    selector,
+    {
 
-    icon: "⚠️",
+      icon: "📊",
 
-    title:
-      "Unable To Load Data",
+      title:
+        "No Data Available",
 
-    subtitle:
-      message
+      subtitle:
+        message
 
-  });
+    }
+  );
 
 }
