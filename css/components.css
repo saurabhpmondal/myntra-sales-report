@@ -1,1 +1,426 @@
-// components.css
+/* ==========================================
+   COMPONENTS.CSS
+   Myntra Sales Intelligence
+========================================== */
+
+/* ==========================================
+   CARDS
+========================================== */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-body {
+  padding: var(--space-20);
+}
+
+.card-title {
+  font-size: var(--font-sm);
+  font-weight: var(--fw-600);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.card-value {
+  font-size: var(--font-2xl);
+  font-weight: var(--fw-700);
+  color: var(--text-primary);
+}
+
+.card-subtitle {
+  margin-top: var(--space-8);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+/* ==========================================
+   KPI CARDS
+========================================== */
+
+.kpi-grid {
+  display: grid;
+  gap: var(--space-16);
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-20);
+  box-shadow: var(--shadow-sm);
+  transition: all .2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-label {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-weight: var(--fw-600);
+}
+
+.kpi-value {
+  margin-top: var(--space-12);
+  font-size: var(--font-2xl);
+  font-weight: var(--fw-700);
+}
+
+.kpi-footer {
+  margin-top: var(--space-12);
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+/* ==========================================
+   FILTERS
+========================================== */
+
+.filter-group {
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: var(--fw-600);
+}
+
+.filter-control {
+  width: 100%;
+  height: 42px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  background: white;
+
+  padding: 0 12px;
+
+  color: var(--text-primary);
+}
+
+.filter-control:focus {
+  border-color: var(--primary);
+}
+
+/* ==========================================
+   TABS
+========================================== */
+
+.tab-button {
+  height: 44px;
+
+  border-radius: var(--radius-md);
+
+  padding: 0 var(--space-20);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: var(--font-sm);
+  font-weight: var(--fw-600);
+
+  color: var(--text-secondary);
+
+  transition: all .2s ease;
+
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  background: rgba(255, 63, 108, 0.08);
+}
+
+.tab-button.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* ==========================================
+   SUMMARY BADGES
+========================================== */
+
+.summary-badge {
+  background: white;
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius-md);
+
+  padding: var(--space-12) var(--space-16);
+
+  min-width: 180px;
+}
+
+.summary-label {
+  color: var(--text-secondary);
+  font-size: var(--font-xs);
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  color: var(--text-primary);
+  font-weight: var(--fw-700);
+}
+
+/* ==========================================
+   TABLES
+========================================== */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+
+  background: white;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-sm);
+}
+
+.report-table {
+  min-width: 100%;
+}
+
+.report-table thead {
+  background: #fafafa;
+}
+
+.report-table th {
+  padding: 14px;
+
+  border-bottom: 1px solid var(--border);
+
+  font-size: var(--font-sm);
+  font-weight: var(--fw-700);
+
+  color: var(--text-primary);
+
+  white-space: nowrap;
+}
+
+.report-table td {
+  padding: 14px;
+
+  border-bottom: 1px solid #f3f4f6;
+
+  font-size: var(--font-sm);
+
+  color: var(--text-primary);
+}
+
+.report-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* ==========================================
+   SECTION HEADERS
+========================================== */
+
+.section-header {
+  margin-bottom: var(--space-16);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: var(--font-xl);
+  font-weight: var(--fw-700);
+}
+
+.section-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+/* ==========================================
+   CHARTS
+========================================== */
+
+.chart-card {
+  background: white;
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-sm);
+
+  padding: var(--space-20);
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 420px;
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.btn {
+  height: 42px;
+
+  border-radius: var(--radius-md);
+
+  padding: 0 var(--space-16);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: var(--font-sm);
+  font-weight: var(--fw-600);
+
+  transition: all .2s ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: #fafafa;
+}
+
+/* ==========================================
+   BADGES
+========================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+
+  border-radius: 999px;
+
+  padding: 4px 10px;
+
+  font-size: var(--font-xs);
+  font-weight: var(--fw-600);
+}
+
+.badge-success {
+  background: rgba(22,163,74,.12);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: rgba(245,158,11,.12);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: rgba(220,38,38,.12);
+  color: var(--danger);
+}
+
+/* ==========================================
+   LOADER
+========================================== */
+
+.loader {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  border: 4px solid #e5e7eb;
+  border-top-color: var(--primary);
+
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.empty-state {
+  background: white;
+
+  border: 1px dashed var(--border);
+
+  border-radius: var(--radius-lg);
+
+  padding: 60px 20px;
+
+  text-align: center;
+}
+
+.empty-state-title {
+  font-size: var(--font-lg);
+  font-weight: var(--fw-700);
+}
+
+.empty-state-subtitle {
+  margin-top: var(--space-8);
+  color: var(--text-secondary);
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1200px) {
+
+  .kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .chart-container {
+    min-height: 320px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
