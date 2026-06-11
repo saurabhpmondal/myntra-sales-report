@@ -3,19 +3,11 @@
    Myntra Sales Intelligence
 ========================================== */
 
-const STORE = {
+const APP_DATA = {};
 
-  appData: {},
+const LOOKUPS = {};
 
-  lookups: {},
-
-  reports: {},
-
-  meta: {
-    loadedAt: null
-  }
-
-};
+let LOADED_AT = null;
 
 /* ==========================================
    APP DATA
@@ -23,10 +15,13 @@ const STORE = {
 
 export function setAppData(
   key,
-  value
+  data
 ) {
 
-  STORE.appData[key] = value;
+  APP_DATA[key] =
+    Array.isArray(data)
+      ? data
+      : [];
 
 }
 
@@ -34,19 +29,29 @@ export function getAppData(
   key
 ) {
 
-  return STORE.appData[key];
+  return (
+    APP_DATA[key] ||
+    []
+  );
 
 }
 
 export function getAllAppData() {
 
-  return STORE.appData;
+  return {
+    ...APP_DATA
+  };
 
 }
 
 export function clearAppData() {
 
-  STORE.appData = {};
+  Object.keys(
+    APP_DATA
+  ).forEach(
+    key =>
+      delete APP_DATA[key]
+  );
 
 }
 
@@ -56,10 +61,11 @@ export function clearAppData() {
 
 export function setLookup(
   key,
-  value
+  data
 ) {
 
-  STORE.lookups[key] = value;
+  LOOKUPS[key] =
+    data || {};
 
 }
 
@@ -67,99 +73,62 @@ export function getLookup(
   key
 ) {
 
-  return STORE.lookups[key];
+  return (
+    LOOKUPS[key] ||
+    {}
+  );
 
 }
 
 export function getAllLookups() {
 
-  return STORE.lookups;
+  return {
+    ...LOOKUPS
+  };
 
 }
 
 export function clearLookups() {
 
-  STORE.lookups = {};
+  Object.keys(
+    LOOKUPS
+  ).forEach(
+    key =>
+      delete LOOKUPS[key]
+  );
 
 }
 
 /* ==========================================
-   REPORT CACHE
-========================================== */
-
-export function setReportCache(
-  reportId,
-  data
-) {
-
-  STORE.reports[reportId] = data;
-
-}
-
-export function getReportCache(
-  reportId
-) {
-
-  return STORE.reports[reportId];
-
-}
-
-export function clearReportCache(
-  reportId
-) {
-
-  delete STORE.reports[reportId];
-
-}
-
-export function clearAllReportCache() {
-
-  STORE.reports = {};
-
-}
-
-/* ==========================================
-   META
+   LOAD TIME
 ========================================== */
 
 export function setLoadedAt(
-  value
+  value = new Date()
 ) {
 
-  STORE.meta.loadedAt = value;
+  LOADED_AT =
+    value;
 
 }
 
 export function getLoadedAt() {
 
-  return STORE.meta.loadedAt;
+  return LOADED_AT;
 
 }
 
 /* ==========================================
-   FULL RESET
+   RESET CACHE
 ========================================== */
 
-export function resetCache() {
+export function clearCache() {
 
-  STORE.appData = {};
+  clearAppData();
 
-  STORE.lookups = {};
+  clearLookups();
 
-  STORE.reports = {};
-
-  STORE.meta.loadedAt = null;
-
-}
-
-/* ==========================================
-   DEBUG
-========================================== */
-
-export function getCacheSnapshot() {
-
-  return structuredClone(
-    STORE
-  );
+  LOADED_AT =
+    null;
 
 }
