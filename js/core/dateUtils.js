@@ -3,22 +3,42 @@
    Myntra Sales Intelligence
 ========================================== */
 
-const MONTH_ORDER = {
+/* ==========================================
+   MONTH NAMES
+========================================== */
 
-  JAN: 1,
-  FEB: 2,
-  MAR: 3,
-  APR: 4,
-  MAY: 5,
-  JUN: 6,
-  JUL: 7,
-  AUG: 8,
-  SEP: 9,
-  OCT: 10,
-  NOV: 11,
-  DEC: 12
+const MONTH_NAMES = {
+
+  1: "January",
+  2: "February",
+  3: "March",
+  4: "April",
+  5: "May",
+  6: "June",
+  7: "July",
+  8: "August",
+  9: "September",
+  10: "October",
+  11: "November",
+  12: "December"
 
 };
+
+/* ==========================================
+   MONTH NAME
+========================================== */
+
+export function getMonthName(
+  month
+) {
+
+  return (
+    MONTH_NAMES[
+      Number(month)
+    ] || String(month)
+  );
+
+}
 
 /* ==========================================
    MONTH KEY
@@ -29,322 +49,277 @@ export function buildMonthKey(
   year
 ) {
 
-  const monthValue =
-    getMonthNumber(
-      month
-    );
-
-  return Number(
-    `${year}${String(
-      monthValue
-    ).padStart(2, "0")}`
-  );
+  return `${year}-${String(
+    month
+  ).padStart(
+    2,
+    "0"
+  )}`;
 
 }
 
 /* ==========================================
-   MONTH NUMBER
+   MONTH LABEL
 ========================================== */
 
-export function getMonthNumber(
-  month
+export function buildMonthLabel(
+  month,
+  year
 ) {
 
-  if (
-    month === null ||
-    month === undefined
-  ) {
-    return 0;
-  }
-
-  const value =
-    String(month)
-      .trim()
-      .toUpperCase();
-
-  if (
-    !isNaN(value)
-  ) {
-
-    return Number(
-      value
-    );
-
-  }
-
-  return (
-    MONTH_ORDER[
-      value.slice(0, 3)
-    ] || 0
-  );
+  return `${getMonthName(
+    month
+  )} ${year}`;
 
 }
 
 /* ==========================================
-   SORT MONTHS
+   BUILD SALES MONTHS
 ========================================== */
 
-export function sortMonths(
-  rows = []
-) {
-
-  return [...rows].sort(
-    (a, b) => {
-
-      const aKey =
-        buildMonthKey(
-          a.month,
-          a.year
-        );
-
-      const bKey =
-        buildMonthKey(
-          b.month,
-          b.year
-        );
-
-      return (
-        bKey - aKey
-      );
-
-    }
-  );
-
-}
-
-/* ==========================================
-   GET LATEST MONTH
-========================================== */
-
-export function getLatestMonth(
-  rows = []
-) {
-
-  if (!rows.length) {
-    return null;
-  }
-
-  return sortMonths(
-    rows
-  )[0];
-
-}
-
-/* ==========================================
-   UNIQUE MONTHS
-========================================== */
-
-export function getUniqueMonths(
-  rows = []
+export function buildSalesMonths(
+  sales = []
 ) {
 
   const map =
     new Map();
 
-  rows.forEach(
+  sales.forEach(
     row => {
+
+      const month =
+        row.month;
+
+      const year =
+        row.year;
+
+      if (
+        !month ||
+        !year
+      ) {
+
+        return;
+
+      }
 
       const key =
-        `${row.month}_${row.year}`;
-
-      if (
-        !map.has(key)
-      ) {
-
-        map.set(
-          key,
-          {
-            month:
-              row.month,
-            year:
-              row.year
-          }
+        buildMonthKey(
+          month,
+          year
         );
 
-      }
+      map.set(
+        key,
+        {
 
-    }
-  );
+          month,
 
-  return sortMonths(
-    Array.from(
-      map.values()
-    )
-  );
+          year,
 
-}
+          monthKey:
+            key,
 
-/* ==========================================
-   UNIQUE DATES
-========================================== */
+          monthLabel:
+            buildMonthLabel(
+              month,
+              year
+            )
 
-export function getUniqueDates(
-  rows = []
-) {
-
-  const map =
-    new Map();
-
-  rows.forEach(
-    row => {
-
-      const date =
-        row.date;
-
-      if (
-        !date
-      ) {
-        return;
-      }
-
-      if (
-        !map.has(date)
-      ) {
-
-        map.set(
-          date,
-          date
-        );
-
-      }
+        }
+      );
 
     }
   );
 
   return Array.from(
     map.values()
-  ).sort();
+  ).sort(
+    (a, b) =>
+      b.monthKey.localeCompare(
+        a.monthKey
+      )
+  );
 
 }
 
 /* ==========================================
-   MONTH COMPARISON
+   LATEST MONTH
 ========================================== */
 
-export function compareMonthValues(
+export function getLatestMonth(
+  sales = []
+) {
+
+  const months =
+    buildSalesMonths(
+      sales
+    );
+
+  return (
+    months[0] ||
+    null
+  );
+
+}
+
+/* ==========================================
+   MONTH OPTIONS
+========================================== */
+
+export function getMonthOptions(
+  sales = []
+) {
+
+  return buildSalesMonths(
+    sales
+  ).map(
+    item => ({
+
+      value:
+        item.monthKey,
+
+      label:
+        item.monthLabel
+
+    })
+  );
+
+}
+
+/* ==========================================
+   UNIQUE SALES DATES
+========================================== */
+
+export function getSalesDates(
+  sales = []
+) {
+
+  return [
+    ...new Set(
+      sales
+        .map(
+          row =>
+            row.date
+        )
+        .filter(Boolean)
+    )
+  ].sort();
+
+}
+
+/* ==========================================
+   MIN SALES DATE
+========================================== */
+
+export function getMinSalesDate(
+  sales = []
+) {
+
+  const dates =
+    getSalesDates(
+      sales
+    );
+
+  return (
+    dates[0] ||
+    ""
+  );
+
+}
+
+/* ==========================================
+   MAX SALES DATE
+========================================== */
+
+export function getMaxSalesDate(
+  sales = []
+) {
+
+  const dates =
+    getSalesDates(
+      sales
+    );
+
+  return (
+    dates.at(-1) ||
+    ""
+  );
+
+}
+
+/* ==========================================
+   DATE RANGE FILTER
+========================================== */
+
+export function isDateInRange(
+  rowDate,
+  fromDate,
+  toDate
+) {
+
+  if (
+    !rowDate
+  ) {
+
+    return false;
+
+  }
+
+  if (
+    fromDate &&
+    rowDate < fromDate
+  ) {
+
+    return false;
+
+  }
+
+  if (
+    toDate &&
+    rowDate > toDate
+  ) {
+
+    return false;
+
+  }
+
+  return true;
+
+}
+
+/* ==========================================
+   GROWTH %
+========================================== */
+
+export function calculateGrowth(
   currentValue = 0,
   previousValue = 0
 ) {
 
-  if (
-    Number(previousValue) === 0
-  ) {
+  currentValue =
+    Number(
+      currentValue
+    ) || 0;
 
-    return {
-      growth: 0,
-      growthText: "0%"
-    };
-
-  }
-
-  const growth =
-    (
-      (
-        currentValue -
-        previousValue
-      ) /
+  previousValue =
+    Number(
       previousValue
-    ) * 100;
-
-  return {
-
-    growth,
-
-    growthText:
-      `${growth.toFixed(
-        2
-      )}%`
-
-  };
-
-}
-
-/* ==========================================
-   PROJECT MONTH END
-========================================== */
-
-export function projectMonthEnd(
-  currentUnits = 0,
-  elapsedDays = 1,
-  totalDays = 30
-) {
+    ) || 0;
 
   if (
-    elapsedDays <= 0
+    previousValue === 0
   ) {
 
     return 0;
 
   }
 
-  const ads =
-    currentUnits /
-    elapsedDays;
-
-  return Math.round(
-    ads *
-      totalDays
-  );
-
-}
-
-/* ==========================================
-   DAYS IN MONTH
-========================================== */
-
-export function getDaysInMonth(
-  month,
-  year
-) {
-
-  const monthNumber =
-    getMonthNumber(
-      month
-    );
-
-  if (
-    !monthNumber ||
-    !year
-  ) {
-
-    return 30;
-
-  }
-
-  return new Date(
-    Number(year),
-    monthNumber,
-    0
-  ).getDate();
-
-}
-
-/* ==========================================
-   CURRENT MONTH DAY COUNT
-========================================== */
-
-export function getElapsedDays(
-  latestDate
-) {
-
-  if (
-    !latestDate
-  ) {
-
-    return 1;
-
-  }
-
-  const date =
-    new Date(
-      latestDate
-    );
-
-  const day =
-    date.getDate();
-
   return (
-    day || 1
-  );
+    (
+      currentValue -
+      previousValue
+    ) /
+    previousValue
+  ) * 100;
 
 }
