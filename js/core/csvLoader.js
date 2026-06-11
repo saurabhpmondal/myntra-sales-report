@@ -3,103 +3,75 @@
    Myntra Sales Intelligence
 ========================================== */
 
-const CSV_CACHE = new Map();
-
 /* ==========================================
-   PUBLIC
+   LOAD CSV
 ========================================== */
 
-export async function loadCSV(url) {
+export async function loadCsv(
+  url
+) {
 
-  if (!url) {
+  const response =
+    await fetch(url);
+
+  if (
+    !response.ok
+  ) {
+
     throw new Error(
-      "CSV URL is required."
-    );
-  }
-
-  if (CSV_CACHE.has(url)) {
-    return CSV_CACHE.get(url);
-  }
-
-  try {
-
-    const response = await fetch(
-      url,
-      {
-        method: "GET",
-        cache: "no-store"
-      }
+      `Failed to load CSV: ${url}`
     );
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch CSV: ${response.status}`
+  }
+
+  const csvText =
+    await response.text();
+
+  return parseCsv(
+    csvText
+  );
+
+}
+
+/* ==========================================
+   PARSE CSV
+========================================== */
+
+function parseCsv(
+  csvText
+) {
+
+  const rows = [];
+
+  const lines =
+    csvText
+      .replace(
+        /\r/g,
+        ""
+      )
+      .split("\n")
+      .filter(
+        line =>
+          line.trim()
       );
-    }
 
-    const csvText =
-      await response.text();
-
-    const rows =
-      parseCSV(csvText);
-
-    CSV_CACHE.set(
-      url,
-      rows
-    );
+  if (
+    !lines.length
+  ) {
 
     return rows;
 
-  } catch (error) {
-
-    console.error(
-      "CSV Load Error:",
-      error
-    );
-
-    throw error;
-  }
-
-}
-
-/* ==========================================
-   CACHE HELPERS
-========================================== */
-
-export function clearCSVCache() {
-
-  CSV_CACHE.clear();
-
-}
-
-export function getCSVCacheSize() {
-
-  return CSV_CACHE.size;
-
-}
-
-/* ==========================================
-   CSV PARSER
-========================================== */
-
-function parseCSV(csv) {
-
-  if (!csv) return [];
-
-  const lines =
-    csv
-      .replace(/\r/g, "")
-      .split("\n")
-      .filter(Boolean);
-
-  if (!lines.length) {
-    return [];
   }
 
   const headers =
-    parseCSVLine(lines[0]);
-
-  const output = [];
+    parseLine(
+      lines[0]
+    ).map(
+      header =>
+        sanitizeKey(
+          header
+        )
+    );
 
   for (
     let i = 1;
@@ -108,43 +80,53 @@ function parseCSV(csv) {
   ) {
 
     const values =
-      parseCSVLine(lines[i]);
+      parseLine(
+        lines[i]
+      );
 
     const row = {};
 
     headers.forEach(
-      (header, index) => {
+      (
+        header,
+        index
+      ) => {
 
-        const key =
-          sanitizeHeader(header);
-
-        row[key] =
+        row[header] =
           normalizeValue(
-            values[index]
+            values[
+              index
+            ]
           );
 
       }
     );
 
-    output.push(row);
+    rows.push(
+      row
+    );
 
   }
 
-  return output;
+  return rows;
 
 }
 
 /* ==========================================
-   PARSE SINGLE LINE
+   CSV LINE PARSER
 ========================================== */
 
-function parseCSVLine(line) {
+function parseLine(
+  line
+) {
 
   const result = [];
 
-  let current = "";
+  let current =
+    "";
 
-  let inQuotes = false;
+  let insideQuotes =
+    false;
 
   for (
     let i = 0;
@@ -152,29 +134,15 @@ function parseCSVLine(line) {
     i++
   ) {
 
-    const char = line[i];
-
-    const next =
-      line[i + 1];
+    const char =
+      line[i];
 
     if (
-      char === '"' &&
-      inQuotes &&
-      next === '"'
+      char === '"'
     ) {
 
-      current += '"';
-
-      i++;
-
-      continue;
-
-    }
-
-    if (char === '"') {
-
-      inQuotes =
-        !inQuotes;
+      insideQuotes =
+        !insideQuotes;
 
       continue;
 
@@ -182,10 +150,12 @@ function parseCSVLine(line) {
 
     if (
       char === "," &&
-      !inQuotes
+      !insideQuotes
     ) {
 
-      result.push(current);
+      result.push(
+        current
+      );
 
       current = "";
 
@@ -193,56 +163,67 @@ function parseCSVLine(line) {
 
     }
 
-    current += char;
+    current +=
+      char;
 
   }
 
-  result.push(current);
+  result.push(
+    current
+  );
 
   return result;
 
 }
 
 /* ==========================================
-   HEADER CLEANER
+   NORMALIZE VALUE
 ========================================== */
 
-function sanitizeHeader(header) {
+function normalizeValue(
+  value
+) {
 
-  return String(header || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "_");
+  if (
+    value ===
+      undefined ||
+    value === null
+  ) {
+
+    return "";
+
+  }
+
+  return String(
+    value
+  ).trim();
 
 }
 
 /* ==========================================
-   VALUE NORMALIZER
+   SANITIZE HEADER
 ========================================== */
 
-function normalizeValue(value) {
+function sanitizeKey(
+  value
+) {
 
-  if (
-    value === undefined ||
-    value === null
-  ) {
-    return "";
-  }
-
-  const cleaned =
-    String(value).trim();
-
-  if (cleaned === "") {
-    return "";
-  }
-
-  if (
-    cleaned === "null" ||
-    cleaned === "NULL"
-  ) {
-    return "";
-  }
-
-  return cleaned;
+  return String(
+    value || ""
+  )
+    .trim()
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]+/g,
+      "_"
+    )
+    .replace(
+      /^_+/,
+      ""
+    )
+    .replace(
+      /_+$/,
+      ""
+    );
 
 }
