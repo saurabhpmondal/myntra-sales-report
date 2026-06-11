@@ -1,6 +1,5 @@
 /* ==========================================
    DASHBOARD FETCHER
-   Myntra Sales Intelligence
 ========================================== */
 
 import {
@@ -41,10 +40,15 @@ export function fetchDashboardData() {
   const filters =
     getFilters();
 
-  const filteredSales =
-    applySalesFilters(
+  const enrichedSales =
+    enrichSalesRows(
       sales,
-      styleMaster,
+      styleMaster
+    );
+
+  const filteredSales =
+    applyFilters(
+      enrichedSales,
       filters
     );
 
@@ -55,158 +59,9 @@ export function fetchDashboardData() {
 
     sjitStock,
 
-    sorStock,
-
-    filters
+    sorStock
 
   };
-
-}
-
-/* ==========================================
-   SALES FILTERS
-========================================== */
-
-function applySalesFilters(
-  rows,
-  styleMaster,
-  filters
-) {
-
-  return rows.filter(
-    row => {
-
-      const styleInfo =
-        styleMaster[
-          row.style_id
-        ] || {};
-
-      /* ======================
-         MONTH
-      ====================== */
-
-      if (
-        filters.month !==
-        "ALL"
-      ) {
-
-        if (
-          String(
-            row.month || ""
-          ) !==
-          String(
-            filters.month
-          )
-        ) {
-
-          return false;
-
-        }
-
-      }
-
-      /* ======================
-         DATE
-      ====================== */
-
-      if (
-        filters.date !==
-        "ALL"
-      ) {
-
-        if (
-          String(
-            row.date || ""
-          ) !==
-          String(
-            filters.date
-          )
-        ) {
-
-          return false;
-
-        }
-
-      }
-
-      /* ======================
-         BRAND
-      ====================== */
-
-      if (
-        filters.brand !==
-        "ALL"
-      ) {
-
-        if (
-          String(
-            row.brand || ""
-          ) !==
-          String(
-            filters.brand
-          )
-        ) {
-
-          return false;
-
-        }
-
-      }
-
-      /* ======================
-         ARTICLE TYPE
-      ====================== */
-
-      if (
-        filters.articleType !==
-        "ALL"
-      ) {
-
-        if (
-          String(
-            styleInfo.article_type ||
-            ""
-          ) !==
-          String(
-            filters.articleType
-          )
-        ) {
-
-          return false;
-
-        }
-
-      }
-
-      /* ======================
-         ERP STATUS
-      ====================== */
-
-      if (
-        filters.erpStatus !==
-        "ALL"
-      ) {
-
-        if (
-          String(
-            styleInfo.status ||
-            ""
-          ) !==
-          String(
-            filters.erpStatus
-          )
-        ) {
-
-          return false;
-
-        }
-
-      }
-
-      return true;
-
-    }
-  );
 
 }
 
@@ -214,19 +69,15 @@ function applySalesFilters(
    ENRICH SALES
 ========================================== */
 
-export function enrichSalesRows(
-  salesRows = []
+function enrichSalesRows(
+  sales,
+  styleMaster
 ) {
 
-  const styleMaster =
-    getLookup(
-      "styleMaster"
-    ) || {};
-
-  return salesRows.map(
+  return sales.map(
     row => {
 
-      const styleInfo =
+      const style =
         styleMaster[
           row.style_id
         ] || {};
@@ -236,18 +87,163 @@ export function enrichSalesRows(
         ...row,
 
         erp_status:
-          styleInfo.status ||
-          "",
+          style.status ||
+          "UNKNOWN",
 
         article_type:
-          styleInfo.article_type ||
+          style.article_type ||
           "",
 
         erp_sku:
-          styleInfo.erp_sku ||
+          style.erp_sku ||
           ""
 
       };
+
+    }
+  );
+
+}
+
+/* ==========================================
+   APPLY FILTERS
+========================================== */
+
+function applyFilters(
+  rows,
+  filters
+) {
+
+  return rows.filter(
+    row => {
+
+      /* =====================
+         MONTH
+      ===================== */
+
+      if (
+        filters.monthKey !==
+        "ALL"
+      ) {
+
+        const rowMonthKey =
+          `${row.year}-${String(
+            row.month
+          ).padStart(
+            2,
+            "0"
+          )}`;
+
+        if (
+          rowMonthKey !==
+          filters.monthKey
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         FROM DATE
+      ===================== */
+
+      if (
+        filters.fromDate
+      ) {
+
+        if (
+          row.date <
+          filters.fromDate
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         TO DATE
+      ===================== */
+
+      if (
+        filters.toDate
+      ) {
+
+        if (
+          row.date >
+          filters.toDate
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         BRAND
+      ===================== */
+
+      if (
+        filters.brand !==
+        "ALL"
+      ) {
+
+        if (
+          row.brand !==
+          filters.brand
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         ERP STATUS
+      ===================== */
+
+      if (
+        filters.erpStatus !==
+        "ALL"
+      ) {
+
+        if (
+          row.erp_status !==
+          filters.erpStatus
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         ARTICLE TYPE
+      ===================== */
+
+      if (
+        filters.articleType !==
+        "ALL"
+      ) {
+
+        if (
+          row.article_type !==
+          filters.articleType
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      return true;
 
     }
   );
