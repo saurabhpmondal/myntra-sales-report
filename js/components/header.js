@@ -4,13 +4,12 @@
 ========================================== */
 
 import {
-  getLoadedAt,
-  getAllAppData
-} from "../core/cache.js";
-
-import {
   setHTML
 } from "../core/dom.js";
+
+import {
+  getLoadedAt
+} from "../core/cache.js";
 
 /* ==========================================
    RENDER HEADER
@@ -19,43 +18,54 @@ import {
 export function renderHeader() {
 
   const html = `
-  
-    <div class="header-left">
 
-      <img
-        src="./assets/logo.png"
-        alt="Logo"
-        class="header-logo"
-      >
+    <div class="app-header-inner">
 
-      <div class="header-title">
+      <div class="app-brand">
 
-        <h1>
-          Myntra Sales Intelligence
-        </h1>
+        <div class="app-logo">
 
-        <span>
-          Sales • Inventory • Growth • Planning
-        </span>
+          📊
+
+        </div>
+
+        <div>
+
+          <div class="app-title">
+
+            Myntra Sales Intelligence
+
+          </div>
+
+          <div class="app-subtitle">
+
+            Sales • Stock • Business Analytics
+
+          </div>
+
+        </div>
 
       </div>
 
-    </div>
+      <div class="app-actions">
 
-    <div class="header-right">
-
-      <div class="summary-badge">
-
-        <div class="summary-label">
-          Last Refresh
-        </div>
-
-        <div
-          class="summary-value"
-          id="last-refresh-value"
+        <button
+          id="refresh-btn"
+          class="header-btn"
         >
-          -
-        </div>
+
+          Refresh
+
+        </button>
+
+        <button
+          id="export-btn"
+          class="header-btn primary"
+        >
+
+          Export
+
+        </button>
 
       </div>
 
@@ -68,64 +78,6 @@ export function renderHeader() {
     html
   );
 
-  updateHeader();
-
-}
-
-/* ==========================================
-   UPDATE HEADER
-========================================== */
-
-export function updateHeader() {
-
-  updateLastRefresh();
-
-}
-
-/* ==========================================
-   LAST REFRESH
-========================================== */
-
-function updateLastRefresh() {
-
-  const loadedAt =
-    getLoadedAt();
-
-  const element =
-    document.getElementById(
-      "last-refresh-value"
-    );
-
-  if (!element) {
-    return;
-  }
-
-  if (!loadedAt) {
-
-    element.textContent =
-      "-";
-
-    return;
-
-  }
-
-  const date =
-    new Date(
-      loadedAt
-    );
-
-  element.textContent =
-    date.toLocaleString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      }
-    );
-
 }
 
 /* ==========================================
@@ -137,47 +89,69 @@ export function renderSummaryBar(
     selectedMonth = "-",
     recordsLoaded = 0,
     latestDate = "-"
-  } = {}
+  }
 ) {
+
+  const loadedAt =
+    getLoadedAt();
+
+  const refreshTime =
+    loadedAt
+      ? loadedAt.toLocaleString(
+          "en-IN"
+        )
+      : "-";
 
   const html = `
 
-    <div class="summary-badge">
+    <div class="summary-grid">
 
-      <div class="summary-label">
-        Selected Month
+      <div class="summary-card">
+
+        <div class="summary-label">
+          Selected Month
+        </div>
+
+        <div class="summary-value">
+          ${selectedMonth}
+        </div>
+
       </div>
 
-      <div class="summary-value">
-        ${selectedMonth}
+      <div class="summary-card">
+
+        <div class="summary-label">
+          Latest Date
+        </div>
+
+        <div class="summary-value">
+          ${latestDate}
+        </div>
+
       </div>
 
-    </div>
+      <div class="summary-card">
 
-    <div class="summary-badge">
+        <div class="summary-label">
+          Records Loaded
+        </div>
 
-      <div class="summary-label">
-        Records Loaded
+        <div class="summary-value">
+          ${recordsLoaded.toLocaleString("en-IN")}
+        </div>
+
       </div>
 
-      <div class="summary-value">
-        ${Number(
-          recordsLoaded
-        ).toLocaleString(
-          "en-IN"
-        )}
-      </div>
+      <div class="summary-card">
 
-    </div>
+        <div class="summary-label">
+          Last Refresh
+        </div>
 
-    <div class="summary-badge">
+        <div class="summary-value">
+          ${refreshTime}
+        </div>
 
-      <div class="summary-label">
-        Latest Data Date
-      </div>
-
-      <div class="summary-value">
-        ${latestDate}
       </div>
 
     </div>
@@ -192,35 +166,11 @@ export function renderSummaryBar(
 }
 
 /* ==========================================
-   GET TOTAL RECORDS
+   TOTAL RECORDS
 ========================================== */
 
 export function getTotalRecords() {
 
-  const data =
-    getAllAppData();
-
-  let total = 0;
-
-  Object.values(
-    data
-  ).forEach(
-    dataset => {
-
-      if (
-        Array.isArray(
-          dataset
-        )
-      ) {
-
-        total +=
-          dataset.length;
-
-      }
-
-    }
-  );
-
-  return total;
+  return 0;
 
 }
