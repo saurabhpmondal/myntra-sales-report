@@ -1,1 +1,245 @@
-// dashboard.css
+/* ==========================================
+   DASHBOARD.CSS
+   Myntra Sales Intelligence
+========================================== */
+
+/* ==========================================
+   PAGE
+========================================== */
+
+#dashboard-page {
+  width: 100%;
+}
+
+/* ==========================================
+   KPI SECTION
+========================================== */
+
+#dashboard-kpis {
+  margin-bottom: 8px;
+}
+
+#dashboard-kpis .kpi-card {
+
+  min-height: 130px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+}
+
+#dashboard-kpis .kpi-label {
+
+  text-transform: uppercase;
+  letter-spacing: .5px;
+
+}
+
+#dashboard-kpis .kpi-value {
+
+  margin-top: 10px;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: var(--secondary);
+
+}
+
+#dashboard-kpis .kpi-footer {
+
+  margin-top: 10px;
+
+  color: var(--text-secondary);
+
+}
+
+/* ==========================================
+   CHART SECTION
+========================================== */
+
+.chart-card {
+
+  overflow: hidden;
+
+}
+
+.chart-card .section-header {
+
+  margin-bottom: 20px;
+
+}
+
+.chart-container {
+
+  width: 100%;
+
+  min-height: 420px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+/* ==========================================
+   PROJECTION SECTION
+========================================== */
+
+#brand-projection-table,
+#po-type-projection-table {
+
+  margin-top: 12px;
+
+}
+
+/* ==========================================
+   TABLE SECTION
+========================================== */
+
+#status-performance-table,
+#brand-performance-table {
+
+  margin-top: 12px;
+
+}
+
+.report-table td {
+
+  vertical-align: middle;
+
+}
+
+.report-table th {
+
+  position: sticky;
+  top: 0;
+
+  z-index: 1;
+
+}
+
+/* ==========================================
+   SECTION SPACING
+========================================== */
+
+.report-section {
+
+  margin-bottom: 24px;
+
+}
+
+/* ==========================================
+   EMPTY STATES
+========================================== */
+
+.chart-container .empty-state {
+
+  width: 100%;
+
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+}
+
+/* ==========================================
+   FUTURE CHART PLACEHOLDERS
+========================================== */
+
+#daily-units-chart canvas,
+#daily-brand-chart canvas,
+#po-type-chart canvas {
+
+  width: 100% !important;
+
+}
+
+/* ==========================================
+   TABLE HEIGHT
+========================================== */
+
+.table-wrapper {
+
+  max-height: 650px;
+
+  overflow: auto;
+
+}
+
+/* ==========================================
+   DESKTOP
+========================================== */
+
+@media (min-width: 1200px) {
+
+  #dashboard-kpis {
+
+    margin-bottom: 12px;
+
+  }
+
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1024px) {
+
+  .chart-container {
+
+    min-height: 350px;
+
+  }
+
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+  .chart-container {
+
+    min-height: 280px;
+
+  }
+
+  #dashboard-kpis .kpi-value {
+
+    font-size: 24px;
+
+  }
+
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+
+  .chart-container {
+
+    min-height: 240px;
+
+  }
+
+  #dashboard-kpis .kpi-card {
+
+    min-height: 110px;
+
+  }
+
+  #dashboard-kpis .kpi-value {
+
+    font-size: 22px;
+
+  }
+
+}
