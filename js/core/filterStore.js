@@ -5,9 +5,11 @@
 
 const DEFAULT_STATE = {
 
-  month: "ALL",
+  monthKey: "ALL",
 
-  date: "ALL",
+  fromDate: "",
+
+  toDate: "",
 
   brand: "ALL",
 
@@ -21,7 +23,8 @@ let state = {
   ...DEFAULT_STATE
 };
 
-const listeners = new Set();
+const listeners =
+  new Set();
 
 /* ==========================================
    GETTERS
@@ -44,7 +47,7 @@ export function getFilter(
 }
 
 /* ==========================================
-   SETTERS
+   SET FILTER
 ========================================== */
 
 export function setFilter(
@@ -52,23 +55,35 @@ export function setFilter(
   value
 ) {
 
-  if (!(key in state)) {
+  if (
+    !(key in state)
+  ) {
+
     return;
+
   }
 
-  state[key] = value;
+  state[key] =
+    value;
 
   notify();
 
 }
+
+/* ==========================================
+   SET MULTIPLE
+========================================== */
 
 export function setFilters(
   payload = {}
 ) {
 
   state = {
+
     ...state,
+
     ...payload
+
   };
 
   notify();
@@ -90,19 +105,19 @@ export function resetFilters() {
 }
 
 /* ==========================================
-   MONTH DEFAULT
+   INITIALIZE
 ========================================== */
 
 export function initializeFilters(
-  latestMonth
+  latestMonthKey
 ) {
 
   state = {
 
     ...DEFAULT_STATE,
 
-    month:
-      latestMonth?.month ||
+    monthKey:
+      latestMonthKey ||
       "ALL"
 
   };
@@ -118,13 +133,6 @@ export function initializeFilters(
 export function subscribe(
   callback
 ) {
-
-  if (
-    typeof callback !==
-    "function"
-  ) {
-    return () => {};
-  }
 
   listeners.add(
     callback
@@ -159,10 +167,11 @@ function notify() {
           snapshot
         );
 
-      } catch (error) {
+      } catch (
+        error
+      ) {
 
         console.error(
-          "Filter Listener Error",
           error
         );
 
@@ -174,120 +183,145 @@ function notify() {
 }
 
 /* ==========================================
-   FILTER HELPERS
+   APPLY SALES FILTERS
 ========================================== */
 
-export function applyGlobalFilters(
-  rows = [],
-  options = {}
+export function applyFilters(
+  rows = []
 ) {
-
-  const {
-
-    monthField = "month",
-
-    dateField = "date",
-
-    brandField = "brand",
-
-    articleTypeField =
-      "article_type",
-
-    erpStatusField =
-      "erp_status"
-
-  } = options;
 
   return rows.filter(
     row => {
 
-      if (
-        state.month !== "ALL" &&
-        String(
-          row[
-            monthField
-          ] || ""
-        ) !==
-          String(
-            state.month
-          )
-      ) {
-        return false;
-      }
+      /* =====================
+         MONTH
+      ===================== */
 
       if (
-        state.date !== "ALL" &&
-        String(
-          row[
-            dateField
-          ] || ""
-        ) !==
-          String(
-            state.date
-          )
+        state.monthKey !==
+        "ALL"
       ) {
-        return false;
+
+        const rowMonthKey =
+          `${row.year}-${String(
+            row.month
+          ).padStart(
+            2,
+            "0"
+          )}`;
+
+        if (
+          rowMonthKey !==
+          state.monthKey
+        ) {
+
+          return false;
+
+        }
+
       }
 
-      if (
-        state.brand !== "ALL" &&
-        String(
-          row[
-            brandField
-          ] || ""
-        ) !==
-          String(
-            state.brand
-          )
-      ) {
-        return false;
-      }
+      /* =====================
+         FROM DATE
+      ===================== */
 
       if (
-        state.articleType !==
-          "ALL" &&
-        String(
-          row[
-            articleTypeField
-          ] || ""
-        ) !==
-          String(
-            state.articleType
-          )
+        state.fromDate
       ) {
-        return false;
+
+        if (
+          row.date <
+          state.fromDate
+        ) {
+
+          return false;
+
+        }
+
       }
+
+      /* =====================
+         TO DATE
+      ===================== */
+
+      if (
+        state.toDate
+      ) {
+
+        if (
+          row.date >
+          state.toDate
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         BRAND
+      ===================== */
+
+      if (
+        state.brand !==
+        "ALL"
+      ) {
+
+        if (
+          row.brand !==
+          state.brand
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         ERP STATUS
+      ===================== */
 
       if (
         state.erpStatus !==
-          "ALL" &&
-        String(
-          row[
-            erpStatusField
-          ] || ""
-        ) !==
-          String(
-            state.erpStatus
-          )
+        "ALL"
       ) {
-        return false;
+
+        if (
+          row.erp_status !==
+          state.erpStatus
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+      /* =====================
+         ARTICLE TYPE
+      ===================== */
+
+      if (
+        state.articleType !==
+        "ALL"
+      ) {
+
+        if (
+          row.article_type !==
+          state.articleType
+        ) {
+
+          return false;
+
+        }
+
       }
 
       return true;
 
     }
   );
-
-}
-
-/* ==========================================
-   DEBUG
-========================================== */
-
-export function getFilterSnapshot() {
-
-  return {
-    ...state
-  };
 
 }
