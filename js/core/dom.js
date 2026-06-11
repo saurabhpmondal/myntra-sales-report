@@ -1,5 +1,5 @@
 /* ==========================================
-   DOM UTILS
+   DOM HELPERS
    Myntra Sales Intelligence
 ========================================== */
 
@@ -7,7 +7,7 @@
    QUERY SELECTOR
 ========================================== */
 
-export function $(
+export function qs(
   selector,
   parent = document
 ) {
@@ -22,7 +22,7 @@ export function $(
    QUERY SELECTOR ALL
 ========================================== */
 
-export function $$(
+export function qsa(
   selector,
   parent = document
 ) {
@@ -32,39 +32,6 @@ export function $$(
       selector
     )
   );
-
-}
-
-/* ==========================================
-   CREATE ELEMENT
-========================================== */
-
-export function createElement(
-  tag,
-  className = "",
-  html = ""
-) {
-
-  const element =
-    document.createElement(
-      tag
-    );
-
-  if (className) {
-
-    element.className =
-      className;
-
-  }
-
-  if (html) {
-
-    element.innerHTML =
-      html;
-
-  }
-
-  return element;
 
 }
 
@@ -80,11 +47,15 @@ export function setHTML(
   const element =
     typeof selector ===
     "string"
-      ? $(selector)
+      ? qs(selector)
       : selector;
 
-  if (!element) {
+  if (
+    !element
+  ) {
+
     return;
+
   }
 
   element.innerHTML =
@@ -93,48 +64,59 @@ export function setHTML(
 }
 
 /* ==========================================
-   APPEND
+   APPEND HTML
 ========================================== */
 
-export function append(
-  parent,
-  child
+export function appendHTML(
+  selector,
+  html
 ) {
 
+  const element =
+    typeof selector ===
+    "string"
+      ? qs(selector)
+      : selector;
+
   if (
-    !parent ||
-    !child
+    !element
   ) {
 
     return;
 
   }
 
-  parent.appendChild(
-    child
+  element.insertAdjacentHTML(
+    "beforeend",
+    html
   );
 
 }
 
 /* ==========================================
-   CLEAR ELEMENT
+   CLEAR
 ========================================== */
 
-export function clearElement(
+export function clear(
   selector
 ) {
 
   const element =
     typeof selector ===
     "string"
-      ? $(selector)
+      ? qs(selector)
       : selector;
 
-  if (!element) {
+  if (
+    !element
+  ) {
+
     return;
+
   }
 
-  element.innerHTML = "";
+  element.innerHTML =
+    "";
 
 }
 
@@ -149,11 +131,15 @@ export function show(
   const element =
     typeof selector ===
     "string"
-      ? $(selector)
+      ? qs(selector)
       : selector;
 
-  if (!element) {
+  if (
+    !element
+  ) {
+
     return;
+
   }
 
   element.style.display =
@@ -172,15 +158,74 @@ export function hide(
   const element =
     typeof selector ===
     "string"
-      ? $(selector)
+      ? qs(selector)
       : selector;
 
-  if (!element) {
+  if (
+    !element
+  ) {
+
     return;
+
   }
 
   element.style.display =
     "none";
+
+}
+
+/* ==========================================
+   CREATE ELEMENT
+========================================== */
+
+export function createElement(
+  tag,
+  className = ""
+) {
+
+  const element =
+    document.createElement(
+      tag
+    );
+
+  if (
+    className
+  ) {
+
+    element.className =
+      className;
+
+  }
+
+  return element;
+
+}
+
+/* ==========================================
+   SET TEXT
+========================================== */
+
+export function setText(
+  selector,
+  text
+) {
+
+  const element =
+    typeof selector ===
+    "string"
+      ? qs(selector)
+      : selector;
+
+  if (
+    !element
+  ) {
+
+    return;
+
+  }
+
+  element.textContent =
+    text;
 
 }
 
@@ -196,11 +241,15 @@ export function addClass(
   const element =
     typeof selector ===
     "string"
-      ? $(selector)
+      ? qs(selector)
       : selector;
 
-  if (!element) {
+  if (
+    !element
+  ) {
+
     return;
+
   }
 
   element.classList.add(
@@ -221,142 +270,19 @@ export function removeClass(
   const element =
     typeof selector ===
     "string"
-      ? $(selector)
+      ? qs(selector)
       : selector;
 
-  if (!element) {
+  if (
+    !element
+  ) {
+
     return;
+
   }
 
   element.classList.remove(
     className
   );
-
-}
-
-/* ==========================================
-   TOGGLE CLASS
-========================================== */
-
-export function toggleClass(
-  selector,
-  className
-) {
-
-  const element =
-    typeof selector ===
-    "string"
-      ? $(selector)
-      : selector;
-
-  if (!element) {
-    return;
-  }
-
-  element.classList.toggle(
-    className
-  );
-
-}
-
-/* ==========================================
-   EVENT
-========================================== */
-
-export function on(
-  selector,
-  event,
-  handler
-) {
-
-  const element =
-    typeof selector ===
-    "string"
-      ? $(selector)
-      : selector;
-
-  if (!element) {
-    return;
-  }
-
-  element.addEventListener(
-    event,
-    handler
-  );
-
-}
-
-/* ==========================================
-   DATASET
-========================================== */
-
-export function setData(
-  element,
-  key,
-  value
-) {
-
-  if (!element) {
-    return;
-  }
-
-  element.dataset[key] =
-    value;
-
-}
-
-export function getData(
-  element,
-  key
-) {
-
-  if (!element) {
-    return null;
-  }
-
-  return element.dataset[key];
-
-}
-
-/* ==========================================
-   LOADING STATE
-========================================== */
-
-export function setLoading(
-  element,
-  isLoading = true
-) {
-
-  if (!element) {
-    return;
-  }
-
-  if (isLoading) {
-
-    element.setAttribute(
-      "data-loading",
-      "true"
-    );
-
-  } else {
-
-    element.removeAttribute(
-      "data-loading"
-    );
-
-  }
-
-}
-
-/* ==========================================
-   SCROLL TOP
-========================================== */
-
-export function scrollTop() {
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
 
 }
