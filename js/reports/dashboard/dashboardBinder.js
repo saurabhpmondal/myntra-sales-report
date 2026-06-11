@@ -1,6 +1,5 @@
 /* ==========================================
    DASHBOARD BINDER
-   Myntra Sales Intelligence
 ========================================== */
 
 import {
@@ -21,14 +20,23 @@ import {
 } from "../../components/table.js";
 
 import {
-  showLoader
-} from "../../components/loader.js";
+  renderLineChart,
+  renderStackedBarChart,
+  renderDonutChart
+} from "../../components/chart.js";
 
 import {
+  ERP_STATUS_COLUMNS,
   BRAND_COLUMNS,
-  STATUS_COLUMNS,
-  PROJECTION_COLUMNS
+  PO_TYPE_COLUMNS
 } from "./dashboardConfig.js";
+
+import {
+  formatGMV,
+  formatUnits,
+  formatASP,
+  formatPercent
+} from "../../core/formatter.js";
 
 /* ==========================================
    PUBLIC RENDER
@@ -42,78 +50,41 @@ export async function render() {
     );
 
   if (!container) {
+
     return;
+
   }
 
-  showLoader(
-    "#report-container",
-    "Loading Dashboard..."
+  const data =
+    fetchDashboardData();
+
+  const dashboard =
+    buildDashboard(
+      data
+    );
+
+  container.innerHTML =
+    getDashboardHTML();
+
+  renderKpis(
+    dashboard.kpis
   );
 
-  try {
+  renderCharts(
+    dashboard
+  );
 
-    const dashboardData =
-      fetchDashboardData();
+  renderStatusTable(
+    dashboard.statusPerformance
+  );
 
-    const result =
-      buildDashboard(
-        dashboardData
-      );
+  renderBrandTable(
+    dashboard.brandPerformance
+  );
 
-    container.innerHTML =
-      getDashboardHTML();
-
-    renderKpis(
-      result.kpis
-    );
-
-    renderStatusTable(
-      result.statusPerformance
-    );
-
-    renderBrandTable(
-      result.brandPerformance
-    );
-
-    renderBrandProjection(
-      result.brandProjection
-    );
-
-    renderPoTypeProjection(
-      result.poTypeProjection
-    );
-
-    renderChartPlaceholders(
-      result
-    );
-
-  } catch (error) {
-
-    console.error(
-      error
-    );
-
-    container.innerHTML = `
-
-      <div class="empty-state">
-
-        <div class="empty-state-icon">
-          ⚠️
-        </div>
-
-        <div class="empty-state-title">
-          Dashboard Failed To Load
-        </div>
-
-        <div class="empty-state-subtitle">
-          ${error.message}
-        </div>
-
-      </div>
-
-    `;
-
-  }
+  renderPoTypeTable(
+    dashboard.poTypePerformance
+  );
 
 }
 
@@ -138,6 +109,64 @@ function renderKpis(
 }
 
 /* ==========================================
+   CHARTS
+========================================== */
+
+function renderCharts(
+  dashboard
+) {
+
+  renderLineChart(
+    "daily-units-chart",
+    {
+      labels:
+        dashboard
+          .dailyTrend
+          .labels,
+
+      values:
+        dashboard
+          .dailyTrend
+          .values,
+
+      label:
+        "Units"
+    }
+  );
+
+  renderStackedBarChart(
+    "daily-brand-chart",
+    {
+      labels:
+        dashboard
+          .brandTrend
+          .labels,
+
+      datasets:
+        dashboard
+          .brandTrend
+          .datasets
+    }
+  );
+
+  renderDonutChart(
+    "po-type-chart",
+    {
+      labels:
+        dashboard
+          .poTypeChart
+          .labels,
+
+      values:
+        dashboard
+          .poTypeChart
+          .values
+    }
+  );
+
+}
+
+/* ==========================================
    STATUS TABLE
 ========================================== */
 
@@ -145,12 +174,41 @@ function renderStatusTable(
   rows
 ) {
 
+  const formatted =
+    rows.map(
+      row => ({
+
+        status:
+          row.status,
+
+        units:
+          formatUnits(
+            row.units
+          ),
+
+        gmv:
+          formatGMV(
+            row.gmv
+          ),
+
+        share:
+          formatPercent(
+            row.share
+          )
+
+      })
+    );
+
   renderTable(
-    "#status-performance-table",
+    "#status-table",
     {
+
       columns:
-        STATUS_COLUMNS,
-      rows
+        ERP_STATUS_COLUMNS,
+
+      rows:
+        formatted
+
     }
   );
 
@@ -164,151 +222,96 @@ function renderBrandTable(
   rows
 ) {
 
+  const formatted =
+    rows.map(
+      row => ({
+
+        brand:
+          row.brand,
+
+        units:
+          formatUnits(
+            row.units
+          ),
+
+        gmv:
+          formatGMV(
+            row.gmv
+          ),
+
+        asp:
+          formatASP(
+            row.asp
+          ),
+
+        share:
+          formatPercent(
+            row.share
+          )
+
+      })
+    );
+
   renderTable(
-    "#brand-performance-table",
+    "#brand-table",
     {
+
       columns:
         BRAND_COLUMNS,
-      rows
+
+      rows:
+        formatted
+
     }
   );
 
 }
 
 /* ==========================================
-   BRAND PROJECTION
+   PO TYPE TABLE
 ========================================== */
 
-function renderBrandProjection(
+function renderPoTypeTable(
   rows
 ) {
 
+  const formatted =
+    rows.map(
+      row => ({
+
+        poType:
+          row.poType,
+
+        units:
+          formatUnits(
+            row.units
+          ),
+
+        gmv:
+          formatGMV(
+            row.gmv
+          ),
+
+        share:
+          formatPercent(
+            row.share
+          )
+
+      })
+    );
+
   renderTable(
-    "#brand-projection-table",
+    "#po-type-table",
     {
+
       columns:
-        PROJECTION_COLUMNS,
-      rows,
-      emptyMessage:
-        "Projection Coming Soon"
+        PO_TYPE_COLUMNS,
+
+      rows:
+        formatted
+
     }
   );
-
-}
-
-/* ==========================================
-   PO TYPE PROJECTION
-========================================== */
-
-function renderPoTypeProjection(
-  rows
-) {
-
-  renderTable(
-    "#po-type-projection-table",
-    {
-      columns:
-        PROJECTION_COLUMNS,
-      rows,
-      emptyMessage:
-        "Projection Coming Soon"
-    }
-  );
-
-}
-
-/* ==========================================
-   CHART PLACEHOLDERS
-========================================== */
-
-function renderChartPlaceholders() {
-
-  const dailyUnits =
-    document.getElementById(
-      "daily-units-chart"
-    );
-
-  const dailyBrand =
-    document.getElementById(
-      "daily-brand-chart"
-    );
-
-  const poType =
-    document.getElementById(
-      "po-type-chart"
-    );
-
-  if (dailyUnits) {
-
-    dailyUnits.innerHTML = `
-
-      <div class="empty-state">
-
-        <div class="empty-state-icon">
-          📈
-        </div>
-
-        <div class="empty-state-title">
-          Daily Units Trend
-        </div>
-
-        <div class="empty-state-subtitle">
-          Chart Engine Next Step
-        </div>
-
-      </div>
-
-    `;
-
-  }
-
-  if (dailyBrand) {
-
-    dailyBrand.innerHTML = `
-
-      <div class="empty-state">
-
-        <div class="empty-state-icon">
-          📊
-        </div>
-
-        <div class="empty-state-title">
-          Brand Trend
-        </div>
-
-        <div class="empty-state-subtitle">
-          Chart Engine Next Step
-        </div>
-
-      </div>
-
-    `;
-
-  }
-
-  if (poType) {
-
-    poType.innerHTML = `
-
-      <div class="empty-state">
-
-        <div class="empty-state-icon">
-          🥧
-        </div>
-
-        <div class="empty-state-title">
-          PO Type Performance
-        </div>
-
-        <div class="empty-state-subtitle">
-          Chart Engine Next Step
-        </div>
-
-      </div>
-
-    `;
-
-  }
 
 }
 
@@ -321,26 +324,6 @@ function getDashboardHTML() {
   return `
 
     <div id="dashboard-page">
-
-      <section class="report-section">
-
-        <div class="section-header">
-
-          <div>
-
-            <div class="section-title">
-              Dashboard
-            </div>
-
-            <div class="section-subtitle">
-              Sales, Stock & Performance Overview
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
 
       <section class="report-section">
 
@@ -397,7 +380,7 @@ function getDashboardHTML() {
           <div class="section-header">
 
             <div class="section-title">
-              PO Type Performance
+              PO Type Wise Units
             </div>
 
           </div>
@@ -413,56 +396,16 @@ function getDashboardHTML() {
 
       <section class="report-section">
 
-        <div class="grid grid-2">
-
-          <div>
-
-            <div class="section-header">
-
-              <div class="section-title">
-                Brand Projection
-              </div>
-
-            </div>
-
-            <div
-              id="brand-projection-table"
-            ></div>
-
-          </div>
-
-          <div>
-
-            <div class="section-header">
-
-              <div class="section-title">
-                PO Type Projection
-              </div>
-
-            </div>
-
-            <div
-              id="po-type-projection-table"
-            ></div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      <section class="report-section">
-
         <div class="section-header">
 
           <div class="section-title">
-            Status Performance
+            ERP Status Performance
           </div>
 
         </div>
 
         <div
-          id="status-performance-table"
+          id="status-table"
         ></div>
 
       </section>
@@ -478,7 +421,23 @@ function getDashboardHTML() {
         </div>
 
         <div
-          id="brand-performance-table"
+          id="brand-table"
+        ></div>
+
+      </section>
+
+      <section class="report-section">
+
+        <div class="section-header">
+
+          <div class="section-title">
+            PO Type Performance
+          </div>
+
+        </div>
+
+        <div
+          id="po-type-table"
         ></div>
 
       </section>
