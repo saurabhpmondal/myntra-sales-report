@@ -1,17 +1,5 @@
 /* ==========================================
    DASHBOARD ENGINE
-   Myntra Sales Intelligence
-========================================== */
-
-import {
-  formatGMV,
-  formatASP,
-  formatUnits,
-  formatPercent
-} from "../../core/formatter.js";
-
-/* ==========================================
-   BUILD DASHBOARD
 ========================================== */
 
 export function buildDashboard(
@@ -22,65 +10,44 @@ export function buildDashboard(
   }
 ) {
 
-  const kpis =
-    buildKpis(
-      sales,
-      sjitStock,
-      sorStock
-    );
-
-  const dailyTrend =
-    buildDailyTrend(
-      sales
-    );
-
-  const brandTrend =
-    buildBrandTrend(
-      sales
-    );
-
-  const poTypePerformance =
-    buildPoTypePerformance(
-      sales
-    );
-
-  const brandPerformance =
-    buildBrandPerformance(
-      sales
-    );
-
-  const statusPerformance =
-    buildStatusPerformance(
-      sales
-    );
-
-  const brandProjection =
-    buildBrandProjection(
-      sales
-    );
-
-  const poTypeProjection =
-    buildPoTypeProjection(
-      sales
-    );
-
   return {
 
-    kpis,
+    kpis:
+      buildKpis(
+        sales,
+        sjitStock,
+        sorStock
+      ),
 
-    dailyTrend,
+    dailyTrend:
+      buildDailyTrend(
+        sales
+      ),
 
-    brandTrend,
+    brandTrend:
+      buildBrandTrend(
+        sales
+      ),
 
-    poTypePerformance,
+    poTypeChart:
+      buildPoTypeChart(
+        sales
+      ),
 
-    brandPerformance,
+    statusPerformance:
+      buildStatusPerformance(
+        sales
+      ),
 
-    statusPerformance,
+    brandPerformance:
+      buildBrandPerformance(
+        sales
+      ),
 
-    brandProjection,
-
-    poTypeProjection
+    poTypePerformance:
+      buildPoTypePerformance(
+        sales
+      )
 
   };
 
@@ -98,8 +65,11 @@ function buildKpis(
 
   const gmv =
     sales.reduce(
-      (sum, row) =>
-        sum +
+      (
+        total,
+        row
+      ) =>
+        total +
         Number(
           row.final_amount || 0
         ),
@@ -108,8 +78,11 @@ function buildKpis(
 
   const units =
     sales.reduce(
-      (sum, row) =>
-        sum +
+      (
+        total,
+        row
+      ) =>
+        total +
         Number(
           row.qty || 0
         ),
@@ -123,8 +96,11 @@ function buildKpis(
 
   const sjit =
     sjitStock.reduce(
-      (sum, row) =>
-        sum +
+      (
+        total,
+        row
+      ) =>
+        total +
         Number(
           row.sellable_inventory_count || 0
         ),
@@ -133,8 +109,11 @@ function buildKpis(
 
   const sor =
     sorStock.reduce(
-      (sum, row) =>
-        sum +
+      (
+        total,
+        row
+      ) =>
+        total +
         Number(
           row.units || 0
         ),
@@ -158,7 +137,7 @@ function buildKpis(
 }
 
 /* ==========================================
-   DAILY TREND
+   DAILY UNITS TREND
 ========================================== */
 
 function buildDailyTrend(
@@ -172,7 +151,7 @@ function buildDailyTrend(
     row => {
 
       const date =
-        row.date || "";
+        row.date;
 
       const qty =
         Number(
@@ -189,25 +168,24 @@ function buildDailyTrend(
     }
   );
 
-  return Array.from(
-    map.entries()
-  )
-    .map(
-      ([date, units]) => ({
+  const labels =
+    Array.from(
+      map.keys()
+    ).sort();
 
-        date,
-
-        units
-
-      })
-    )
-    .sort(
-      (a, b) =>
-        String(a.date)
-          .localeCompare(
-            String(b.date)
-          )
+  const values =
+    labels.map(
+      date =>
+        map.get(date)
     );
+
+  return {
+
+    labels,
+
+    values
+
+  };
 
 }
 
@@ -219,66 +197,90 @@ function buildBrandTrend(
   sales
 ) {
 
-  const map =
-    new Map();
+  const dates =
+    [
+      ...new Set(
+        sales.map(
+          row =>
+            row.date
+        )
+      )
+    ].sort();
 
-  sales.forEach(
-    row => {
+  const brands =
+    [
+      ...new Set(
+        sales.map(
+          row =>
+            row.brand
+        )
+      )
+    ].sort();
 
-      const key =
-        `${row.date}|${row.brand}`;
+  const datasets =
+    brands.map(
+      brand => {
 
-      map.set(
-        key,
-        (
-          map.get(key) || 0
-        ) +
-          Number(
-            row.qty || 0
-          )
-      );
+        const data =
+          dates.map(
+            date => {
 
-    }
-  );
+              return sales
+                .filter(
+                  row =>
+                    row.date ===
+                      date &&
+                    row.brand ===
+                      brand
+                )
+                .reduce(
+                  (
+                    total,
+                    row
+                  ) =>
+                    total +
+                    Number(
+                      row.qty ||
+                        0
+                    ),
+                  0
+                );
 
-  return Array.from(
-    map.entries()
-  ).map(
-    ([key, units]) => {
+            }
+          );
 
-      const [
-        date,
-        brand
-      ] =
-        key.split("|");
+        return {
 
-      return {
+          label:
+            brand,
 
-        date,
+          data
 
-        brand,
+        };
 
-        units
+      }
+    );
 
-      };
+  return {
 
-    }
-  );
+    labels: dates,
+
+    datasets
+
+  };
 
 }
 
 /* ==========================================
-   PO TYPE PERFORMANCE
+   PO TYPE CHART
 ========================================== */
 
-function buildPoTypePerformance(
+function buildPoTypeChart(
   sales
 ) {
 
   const map =
     new Map();
-
-  let totalUnits = 0;
 
   sales.forEach(
     row => {
@@ -292,74 +294,54 @@ function buildPoTypePerformance(
           row.qty || 0
         );
 
-      const gmv =
-        Number(
-          row.final_amount || 0
-        );
-
-      totalUnits += qty;
-
-      if (
-        !map.has(poType)
-      ) {
-
-        map.set(
-          poType,
-          {
-            poType,
-            units: 0,
-            gmv: 0
-          }
-        );
-
-      }
-
-      const current =
-        map.get(poType);
-
-      current.units += qty;
-      current.gmv += gmv;
+      map.set(
+        poType,
+        (
+          map.get(
+            poType
+          ) || 0
+        ) + qty
+      );
 
     }
   );
 
-  return Array.from(
-    map.values()
-  ).map(
-    row => ({
+  return {
 
-      ...row,
+    labels:
+      Array.from(
+        map.keys()
+      ),
 
-      share:
-        totalUnits === 0
-          ? 0
-          : (
-              row.units /
-              totalUnits
-            ) * 100
+    values:
+      Array.from(
+        map.values()
+      )
 
-    })
-  );
+  };
 
 }
 
 /* ==========================================
-   BRAND PERFORMANCE
+   ERP STATUS PERFORMANCE
 ========================================== */
 
-function buildBrandPerformance(
+function buildStatusPerformance(
   sales
 ) {
 
   const map =
     new Map();
 
-  const totalGMV =
+  const totalUnits =
     sales.reduce(
-      (sum, row) =>
-        sum +
+      (
+        total,
+        row
+      ) =>
+        total +
         Number(
-          row.final_amount || 0
+          row.qty || 0
         ),
       0
     );
@@ -367,27 +349,35 @@ function buildBrandPerformance(
   sales.forEach(
     row => {
 
-      const brand =
-        row.brand ||
+      const status =
+        row.erp_status ||
         "UNKNOWN";
 
       if (
-        !map.has(brand)
+        !map.has(
+          status
+        )
       ) {
 
         map.set(
-          brand,
+          status,
           {
-            brand,
+
+            status,
+
             units: 0,
+
             gmv: 0
+
           }
         );
 
       }
 
       const current =
-        map.get(brand);
+        map.get(
+          status
+        );
 
       current.units +=
         Number(
@@ -408,80 +398,51 @@ function buildBrandPerformance(
     .map(
       row => ({
 
-        brand:
-          row.brand,
-
-        units:
-          formatUnits(
-            row.units
-          ),
-
-        gmv:
-          formatGMV(
-            row.gmv
-          ),
-
-        asp:
-          formatASP(
-            row.gmv /
-              (
-                row.units ||
-                1
-              )
-          ),
+        ...row,
 
         share:
-          formatPercent(
-            (
-              row.gmv /
-              (
-                totalGMV ||
-                1
-              )
-            ) * 100
-          )
+          totalUnits ===
+          0
+            ? 0
+            : (
+                row.units /
+                totalUnits
+              ) *
+              100
 
       })
     )
     .sort(
-      (a, b) =>
-        Number(
-          String(
-            b.gmv
-          ).replace(
-            /[^0-9.]/g,
-            ""
-          )
-        ) -
-        Number(
-          String(
-            a.gmv
-          ).replace(
-            /[^0-9.]/g,
-            ""
-          )
-        )
+      (
+        a,
+        b
+      ) =>
+        b.units -
+        a.units
     );
 
 }
 
 /* ==========================================
-   STATUS PERFORMANCE
+   BRAND PERFORMANCE
 ========================================== */
 
-function buildStatusPerformance(
+function buildBrandPerformance(
   sales
 ) {
 
   const map =
     new Map();
 
-  const totalGMV =
+  const totalUnits =
     sales.reduce(
-      (sum, row) =>
-        sum +
+      (
+        total,
+        row
+      ) =>
+        total +
         Number(
-          row.final_amount || 0
+          row.qty || 0
         ),
       0
     );
@@ -489,27 +450,35 @@ function buildStatusPerformance(
   sales.forEach(
     row => {
 
-      const status =
-        row.erp_status ||
+      const brand =
+        row.brand ||
         "UNKNOWN";
 
       if (
-        !map.has(status)
+        !map.has(
+          brand
+        )
       ) {
 
         map.set(
-          status,
+          brand,
           {
-            status,
+
+            brand,
+
             units: 0,
+
             gmv: 0
+
           }
         );
 
       }
 
       const current =
-        map.get(status);
+        map.get(
+          brand
+        );
 
       current.units +=
         Number(
@@ -526,50 +495,139 @@ function buildStatusPerformance(
 
   return Array.from(
     map.values()
-  ).map(
-    row => ({
+  )
+    .map(
+      row => ({
 
-      status:
-        row.status,
+        ...row,
 
-      units:
-        formatUnits(
-          row.units
-        ),
+        asp:
+          row.units ===
+          0
+            ? 0
+            : row.gmv /
+              row.units,
 
-      gmv:
-        formatGMV(
-          row.gmv
-        ),
+        share:
+          totalUnits ===
+          0
+            ? 0
+            : (
+                row.units /
+                totalUnits
+              ) *
+              100
 
-      share:
-        formatPercent(
-          (
-            row.gmv /
-            (
-              totalGMV ||
-              1
-            )
-          ) * 100
-        )
-
-    })
-  );
+      })
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b.units -
+        a.units
+    );
 
 }
 
 /* ==========================================
-   PLACEHOLDER
+   PO TYPE PERFORMANCE
 ========================================== */
 
-function buildBrandProjection() {
+function buildPoTypePerformance(
+  sales
+) {
 
-  return [];
+  const map =
+    new Map();
 
-}
+  const totalUnits =
+    sales.reduce(
+      (
+        total,
+        row
+      ) =>
+        total +
+        Number(
+          row.qty || 0
+        ),
+      0
+    );
 
-function buildPoTypeProjection() {
+  sales.forEach(
+    row => {
 
-  return [];
+      const poType =
+        row.po_type ||
+        "UNKNOWN";
+
+      if (
+        !map.has(
+          poType
+        )
+      ) {
+
+        map.set(
+          poType,
+          {
+
+            poType,
+
+            units: 0,
+
+            gmv: 0
+
+          }
+        );
+
+      }
+
+      const current =
+        map.get(
+          poType
+        );
+
+      current.units +=
+        Number(
+          row.qty || 0
+        );
+
+      current.gmv +=
+        Number(
+          row.final_amount || 0
+        );
+
+    }
+  );
+
+  return Array.from(
+    map.values()
+  )
+    .map(
+      row => ({
+
+        ...row,
+
+        share:
+          totalUnits ===
+          0
+            ? 0
+            : (
+                row.units /
+                totalUnits
+              ) *
+              100
+
+      })
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b.units -
+        a.units
+    );
 
 }
