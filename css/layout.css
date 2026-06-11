@@ -1,1 +1,250 @@
-// layout.css
+/* ==========================================
+   LAYOUT.CSS
+   Myntra Sales Intelligence
+========================================== */
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+#app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+
+  height: var(--header-height);
+
+  background: var(--bg-card);
+
+  border-bottom: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 var(--space-24);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+}
+
+.header-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-title h1 {
+  font-size: var(--font-xl);
+  font-weight: var(--fw-700);
+}
+
+.header-title span {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+}
+
+/* ==========================================
+   FILTER BAR
+========================================== */
+
+#global-filters {
+  position: sticky;
+  top: var(--header-height);
+
+  z-index: var(--z-filter);
+
+  background: var(--bg-card);
+
+  border-bottom: 1px solid var(--border);
+
+  min-height: var(--filter-height);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+
+  padding: var(--space-12) var(--space-24);
+
+  overflow-x: auto;
+}
+
+/* ==========================================
+   SUMMARY BAR
+========================================== */
+
+#summary-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-16);
+
+  padding: var(--space-16) var(--space-24);
+}
+
+/* ==========================================
+   TABS
+========================================== */
+
+#tabs-bar {
+  position: sticky;
+
+  top: calc(
+    var(--header-height) +
+    var(--filter-height)
+  );
+
+  z-index: var(--z-tabs);
+
+  background: var(--bg-card);
+
+  border-bottom: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+
+  gap: var(--space-8);
+
+  padding: 0 var(--space-24);
+
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   REPORT CONTAINER
+========================================== */
+
+#report-container {
+  width: 100%;
+
+  max-width: var(--container-max-width);
+
+  margin: 0 auto;
+
+  padding: var(--space-24);
+}
+
+/* ==========================================
+   SECTION WRAPPER
+========================================== */
+
+.report-section {
+  margin-bottom: var(--space-24);
+}
+
+/* ==========================================
+   GRID HELPERS
+========================================== */
+
+.grid {
+  display: grid;
+  gap: var(--space-16);
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.grid-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1200px) {
+
+  .grid-6,
+  .grid-5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+}
+
+@media (max-width: 992px) {
+
+  .grid-4,
+  .grid-5,
+  .grid-6 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  #app-header {
+    padding: 0 var(--space-16);
+  }
+
+  #global-filters {
+    padding: var(--space-12) var(--space-16);
+  }
+
+  #tabs-bar {
+    padding: 0 var(--space-16);
+  }
+
+  #report-container {
+    padding: var(--space-16);
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .grid-5,
+  .grid-6 {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .header-title h1 {
+    font-size: var(--font-lg);
+  }
+
+  .header-title span {
+    display: none;
+  }
+
+}
