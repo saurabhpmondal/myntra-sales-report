@@ -12,27 +12,12 @@ import {
 ========================================== */
 
 export function renderTable(
-  containerId,
+  selector,
   {
     columns = [],
-    rows = [],
-    emptyMessage =
-      "No Data Available"
+    rows = []
   }
 ) {
-
-  if (!rows.length) {
-
-    setHTML(
-      containerId,
-      buildEmptyState(
-        emptyMessage
-      )
-    );
-
-    return;
-
-  }
 
   const html = `
 
@@ -48,10 +33,10 @@ export function renderTable(
               .map(
                 column => `
 
-                  <th
-                    data-key="${column.key}"
-                  >
+                  <th>
+
                     ${column.label}
+
                   </th>
 
                 `
@@ -64,15 +49,54 @@ export function renderTable(
 
         <tbody>
 
-          ${rows
-            .map(
-              row =>
-                buildRow(
-                  columns,
-                  row
-                )
-            )
-            .join("")}
+          ${
+            rows.length
+              ? rows
+                  .map(
+                    row => `
+
+                      <tr>
+
+                        ${columns
+                          .map(
+                            column => `
+
+                              <td>
+
+                                ${
+                                  row[
+                                    column.key
+                                  ] ?? ""
+                                }
+
+                              </td>
+
+                            `
+                          )
+                          .join("")}
+
+                      </tr>
+
+                    `
+                  )
+                  .join("")
+              : `
+
+                <tr>
+
+                  <td
+                    colspan="${columns.length}"
+                    class="table-empty"
+                  >
+
+                    No Data Available
+
+                  </td>
+
+                </tr>
+
+              `
+          }
 
         </tbody>
 
@@ -83,260 +107,24 @@ export function renderTable(
   `;
 
   setHTML(
-    containerId,
+    selector,
     html
   );
 
 }
 
 /* ==========================================
-   TABLE ROW
+   BUILD COLUMN
 ========================================== */
 
-function buildRow(
-  columns,
-  row
+export function buildColumn(
+  key,
+  label
 ) {
 
-  return `
-
-    <tr>
-
-      ${columns
-        .map(
-          column => `
-
-            <td>
-
-              ${
-                row[
-                  column.key
-                ] ?? ""
-              }
-
-            </td>
-
-          `
-        )
-        .join("")}
-
-    </tr>
-
-  `;
-
-}
-
-/* ==========================================
-   EMPTY STATE
-========================================== */
-
-function buildEmptyState(
-  message
-) {
-
-  return `
-
-    <div class="empty-state">
-
-      <div
-        class="empty-state-title"
-      >
-
-        No Records Found
-
-      </div>
-
-      <div
-        class="empty-state-subtitle"
-      >
-
-        ${message}
-
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-/* ==========================================
-   COLUMN BUILDER
-========================================== */
-
-export function buildColumns(
-  fields = []
-) {
-
-  return fields.map(
-    field => ({
-
-      key: field.key,
-
-      label:
-        field.label
-
-    })
-  );
-
-}
-
-/* ==========================================
-   SIMPLE SEARCH
-========================================== */
-
-export function searchRows(
-  rows = [],
-  keyword = ""
-) {
-
-  if (
-    !keyword ||
-    !rows.length
-  ) {
-
-    return rows;
-
-  }
-
-  const search =
-    String(keyword)
-      .toLowerCase()
-      .trim();
-
-  return rows.filter(
-    row => {
-
-      return Object.values(
-        row
-      ).some(
-        value =>
-
-          String(value)
-            .toLowerCase()
-            .includes(
-              search
-            )
-      );
-
-    }
-  );
-
-}
-
-/* ==========================================
-   SORT ROWS
-========================================== */
-
-export function sortRows(
-  rows = [],
-  field,
-  direction = "desc"
-) {
-
-  if (
-    !field
-  ) {
-
-    return rows;
-
-  }
-
-  return [...rows].sort(
-    (a, b) => {
-
-      const aValue =
-        a[field];
-
-      const bValue =
-        b[field];
-
-      const aNumber =
-        Number(aValue);
-
-      const bNumber =
-        Number(bValue);
-
-      const isNumeric =
-        !isNaN(
-          aNumber
-        ) &&
-        !isNaN(
-          bNumber
-        );
-
-      if (
-        isNumeric
-      ) {
-
-        return direction ===
-          "asc"
-          ? aNumber -
-              bNumber
-          : bNumber -
-              aNumber;
-
-      }
-
-      return direction ===
-        "asc"
-        ? String(
-            aValue
-          ).localeCompare(
-            String(
-              bValue
-            )
-          )
-        : String(
-            bValue
-          ).localeCompare(
-            String(
-              aValue
-            )
-          );
-
-    }
-  );
-
-}
-
-/* ==========================================
-   PAGINATION
-========================================== */
-
-export function paginateRows(
-  rows = [],
-  page = 1,
-  pageSize = 50
-) {
-
-  const start =
-    (page - 1) *
-    pageSize;
-
-  const end =
-    start +
-    pageSize;
-
-  return rows.slice(
-    start,
-    end
-  );
-
-}
-
-/* ==========================================
-   TOTAL PAGES
-========================================== */
-
-export function getTotalPages(
-  totalRows = 0,
-  pageSize = 50
-) {
-
-  return Math.ceil(
-    totalRows /
-      pageSize
-  );
+  return {
+    key,
+    label
+  };
 
 }
