@@ -1,5 +1,5 @@
 /* ==========================================
-   REPORTS CONFIG
+   REPORT CONFIG
    Myntra Sales Intelligence
 ========================================== */
 
@@ -7,76 +7,45 @@ export const REPORTS = [
 
   {
     id: "dashboard",
-    label: "Dashboard",
-    icon: "📊",
-    enabled: true,
-    defaultTab: true
+    name: "Dashboard"
   },
 
   {
-    id: "salesReturn",
-    label: "Sales & Return",
-    icon: "📦",
-    enabled: true
+    id: "sales-return",
+    name: "Sales & Return"
   },
 
   {
     id: "growth",
-    label: "Growth",
-    icon: "📈",
-    enabled: true
+    name: "Growth"
   },
 
   {
     id: "shipment",
-    label: "Shipment",
-    icon: "🚚",
-    enabled: true
+    name: "Shipment"
   },
 
   {
-    id: "businessDashboard",
-    label: "Business Dashboard",
-    icon: "🏢",
-    enabled: true
+    id: "business-dashboard",
+    name: "Business Dashboard"
   },
 
   {
-    id: "oosEye",
-    label: "OOS Eye",
-    icon: "👁️",
-    enabled: true
+    id: "oos-eye",
+    name: "OOS Eye"
   },
 
   {
-    id: "liveCount",
-    label: "Live Count",
-    icon: "🔴",
-    enabled: true
+    id: "live-count",
+    name: "Live Count"
   },
 
   {
-    id: "launchTracker",
-    label: "Launch Tracker",
-    icon: "🚀",
-    enabled: true
+    id: "launch-tracker",
+    name: "Launch Tracker"
   }
 
 ];
-
-/* ==========================================
-   TAB HELPERS
-========================================== */
-
-export const DEFAULT_REPORT =
-  REPORTS.find(
-    report => report.defaultTab
-  )?.id || "dashboard";
-
-export const ENABLED_REPORTS =
-  REPORTS.filter(
-    report => report.enabled
-  );
 
 /* ==========================================
    REPORT REGISTRY
@@ -85,75 +54,59 @@ export const ENABLED_REPORTS =
 export const REPORT_REGISTRY = {
 
   dashboard: {
-    fetcher:
-      "./reports/dashboard/dashboardFetcher.js",
-    engine:
-      "./reports/dashboard/dashboardEngine.js",
+
     binder:
-      "./reports/dashboard/dashboardBinder.js"
+      "../reports/dashboard/dashboardBinder.js"
+
   },
 
-  salesReturn: {
-    fetcher:
-      "./reports/salesReturn/salesReturnFetcher.js",
-    engine:
-      "./reports/salesReturn/salesReturnEngine.js",
+  "sales-return": {
+
     binder:
-      "./reports/salesReturn/salesReturnBinder.js"
+      "../reports/salesReturn/salesReturnBinder.js"
+
   },
 
   growth: {
-    fetcher:
-      "./reports/growth/growthFetcher.js",
-    engine:
-      "./reports/growth/growthEngine.js",
+
     binder:
-      "./reports/growth/growthBinder.js"
+      "../reports/growth/growthBinder.js"
+
   },
 
   shipment: {
-    fetcher:
-      "./reports/shipment/shipmentFetcher.js",
-    engine:
-      "./reports/shipment/shipmentEngine.js",
+
     binder:
-      "./reports/shipment/shipmentBinder.js"
+      "../reports/shipment/shipmentBinder.js"
+
   },
 
-  businessDashboard: {
-    fetcher:
-      "./reports/businessDashboard/businessDashboardFetcher.js",
-    engine:
-      "./reports/businessDashboard/businessDashboardEngine.js",
+  "business-dashboard": {
+
     binder:
-      "./reports/businessDashboard/businessDashboardBinder.js"
+      "../reports/businessDashboard/businessDashboardBinder.js"
+
   },
 
-  oosEye: {
-    fetcher:
-      "./reports/oosEye/oosEyeFetcher.js",
-    engine:
-      "./reports/oosEye/oosEyeEngine.js",
+  "oos-eye": {
+
     binder:
-      "./reports/oosEye/oosEyeBinder.js"
+      "../reports/oosEye/oosEyeBinder.js"
+
   },
 
-  liveCount: {
-    fetcher:
-      "./reports/liveCount/liveCountFetcher.js",
-    engine:
-      "./reports/liveCount/liveCountEngine.js",
+  "live-count": {
+
     binder:
-      "./reports/liveCount/liveCountBinder.js"
+      "../reports/liveCount/liveCountBinder.js"
+
   },
 
-  launchTracker: {
-    fetcher:
-      "./reports/launchTracker/launchTrackerFetcher.js",
-    engine:
-      "./reports/launchTracker/launchTrackerEngine.js",
+  "launch-tracker": {
+
     binder:
-      "./reports/launchTracker/launchTrackerBinder.js"
+      "../reports/launchTracker/launchTrackerBinder.js"
+
   }
 
 };
