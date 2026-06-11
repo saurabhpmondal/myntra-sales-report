@@ -8,7 +8,7 @@
 ========================================== */
 
 export function formatNumber(
-  value = 0,
+  value,
   decimals = 0
 ) {
 
@@ -18,21 +18,24 @@ export function formatNumber(
   return number.toLocaleString(
     "en-IN",
     {
+
       minimumFractionDigits:
         decimals,
+
       maximumFractionDigits:
         decimals
+
     }
   );
 
 }
 
 /* ==========================================
-   INTEGER
+   UNITS
 ========================================== */
 
 export function formatUnits(
-  value = 0
+  value
 ) {
 
   return formatNumber(
@@ -43,41 +46,20 @@ export function formatUnits(
 }
 
 /* ==========================================
-   CURRENCY
+   GMV
 ========================================== */
 
-export function formatCurrency(
-  value = 0,
-  decimals = 0
+export function formatGMV(
+  value
 ) {
 
   const number =
     Number(value) || 0;
 
-  return `₹${number.toLocaleString(
-    "en-IN",
-    {
-      minimumFractionDigits:
-        decimals,
-      maximumFractionDigits:
-        decimals
-    }
-  )}`;
-
-}
-
-/* ==========================================
-   GMV
-========================================== */
-
-export function formatGMV(
-  value = 0
-) {
-
-  return formatCurrency(
-    value,
+  return `₹${formatNumber(
+    number,
     0
-  );
+  )}`;
 
 }
 
@@ -86,181 +68,105 @@ export function formatGMV(
 ========================================== */
 
 export function formatASP(
-  value = 0
+  value
 ) {
 
-  return formatCurrency(
-    value,
+  const number =
+    Number(value) || 0;
+
+  return `₹${formatNumber(
+    number,
     2
-  );
+  )}`;
 
 }
 
 /* ==========================================
-   PERCENTAGE
+   PERCENT
 ========================================== */
 
 export function formatPercent(
-  value = 0,
+  value
+) {
+
+  const number =
+    Number(value) || 0;
+
+  return `${formatNumber(
+    number,
+    2
+  )}%`;
+
+}
+
+/* ==========================================
+   CURRENCY
+========================================== */
+
+export function formatCurrency(
+  value,
   decimals = 2
 ) {
 
   const number =
     Number(value) || 0;
 
-  return `${number.toFixed(
+  return `₹${formatNumber(
+    number,
     decimals
-  )}%`;
+  )}`;
 
 }
 
 /* ==========================================
-   SHARE %
+   DECIMAL
 ========================================== */
 
-export function formatShare(
-  value = 0
+export function formatDecimal(
+  value,
+  decimals = 2
 ) {
 
-  return formatPercent(
+  return formatNumber(
     value,
-    2
+    decimals
   );
 
 }
 
 /* ==========================================
-   GROWTH %
+   SHARE
 ========================================== */
 
-export function formatGrowth(
-  value = 0
-) {
-
-  const number =
-    Number(value) || 0;
-
-  const prefix =
-    number > 0
-      ? "+"
-      : "";
-
-  return `${prefix}${number.toFixed(
-    2
-  )}%`;
-
-}
-
-/* ==========================================
-   DATE
-========================================== */
-
-export function formatDate(
+export function formatShare(
   value
 ) {
 
-  if (!value) {
-    return "-";
-  }
-
-  return String(
+  return formatPercent(
     value
   );
 
 }
 
 /* ==========================================
-   MONTH YEAR
+   SAFE NUMBER
 ========================================== */
 
-export function formatMonthYear(
-  month,
-  year
-) {
-
-  if (
-    !month &&
-    !year
-  ) {
-
-    return "-";
-
-  }
-
-  return `${month}-${year}`;
-
-}
-
-/* ==========================================
-   KPI VALUE
-========================================== */
-
-export function formatKpiValue(
-  type,
+export function toNumber(
   value
 ) {
 
-  switch (type) {
-
-    case "GMV":
-      return formatGMV(
-        value
-      );
-
-    case "ASP":
-      return formatASP(
-        value
-      );
-
-    case "UNITS":
-      return formatUnits(
-        value
-      );
-
-    case "PERCENT":
-      return formatPercent(
-        value
-      );
-
-    default:
-      return formatNumber(
-        value
-      );
-
-  }
-
-}
-
-/* ==========================================
-   SAFE DIVIDE
-========================================== */
-
-export function safeDivide(
-  numerator = 0,
-  denominator = 0
-) {
-
-  numerator =
+  const number =
     Number(
-      numerator
-    ) || 0;
+      String(value || "")
+        .replace(/,/g, "")
+        .trim()
+    );
 
-  denominator =
-    Number(
-      denominator
-    ) || 0;
-
-  if (
-    denominator === 0
-  ) {
-
-    return 0;
-
-  }
-
-  return (
-    numerator /
-    denominator
-  );
+  return isNaN(
+    number
+  )
+    ? 0
+    : number;
 
 }
