@@ -4,18 +4,21 @@
 ========================================== */
 
 import {
-  ENABLED_REPORTS,
-  DEFAULT_REPORT
+  REPORTS
 } from "../config/reportsConfig.js";
 
 import {
   setHTML
 } from "../core/dom.js";
 
-let activeTab =
-  DEFAULT_REPORT;
+/* ==========================================
+   STATE
+========================================== */
 
-let tabChangeHandler =
+let ACTIVE_TAB =
+  "dashboard";
+
+let TAB_CALLBACK =
   null;
 
 /* ==========================================
@@ -24,88 +27,65 @@ let tabChangeHandler =
 
 export function renderTabs() {
 
-  const html =
-    ENABLED_REPORTS
-      .map(
-        report => {
+  const html = `
 
-          return `
+    <div class="tabs-wrapper">
 
-            <button
-              class="tab-button ${
-                report.id === activeTab
-                  ? "active"
-                  : ""
-              }"
-              data-report="${
-                report.id
-              }"
-            >
+      ${REPORTS.map(
+        report => `
 
-              <span>
-                ${report.icon}
-              </span>
+          <button
+            class="report-tab ${
+              report.id ===
+              ACTIVE_TAB
+                ? "active"
+                : ""
+            }"
+            data-tab="${
+              report.id
+            }"
+          >
 
-              <span>
-                ${report.label}
-              </span>
+            ${report.name}
 
-            </button>
+          </button>
 
-          `;
+        `
+      ).join("")}
 
-        }
-      )
-      .join("");
+    </div>
+
+  `;
 
   setHTML(
     "#tabs-bar",
     html
   );
 
-  bindTabEvents();
+  bindEvents();
 
 }
 
 /* ==========================================
-   BIND EVENTS
+   TAB CHANGE
 ========================================== */
 
-function bindTabEvents() {
+export function onTabChange(
+  callback
+) {
 
-  const tabs =
-    document.querySelectorAll(
-      ".tab-button"
-    );
+  TAB_CALLBACK =
+    callback;
 
-  tabs.forEach(
-    tab => {
+}
 
-      tab.addEventListener(
-        "click",
-        () => {
+/* ==========================================
+   ACTIVE TAB
+========================================== */
 
-          const reportId =
-            tab.dataset.report;
+export function getActiveTab() {
 
-          if (
-            reportId ===
-            activeTab
-          ) {
-
-            return;
-
-          }
-
-          setActiveTab(
-            reportId
-          );
-
-        }
-      );
-
-    }
-  );
+  return ACTIVE_TAB;
 
 }
 
@@ -114,87 +94,65 @@ function bindTabEvents() {
 ========================================== */
 
 export function setActiveTab(
-  reportId
+  tabId
 ) {
 
-  activeTab =
-    reportId;
+  ACTIVE_TAB =
+    tabId;
 
-  updateActiveState();
+  renderTabs();
 
-  if (
-    typeof tabChangeHandler ===
-    "function"
-  ) {
+}
 
-    tabChangeHandler(
-      reportId
+/* ==========================================
+   EVENTS
+========================================== */
+
+function bindEvents() {
+
+  document
+    .querySelectorAll(
+      ".report-tab"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          async event => {
+
+            const tabId =
+              event.currentTarget.dataset.tab;
+
+            if (
+              tabId ===
+              ACTIVE_TAB
+            ) {
+
+              return;
+
+            }
+
+            ACTIVE_TAB =
+              tabId;
+
+            renderTabs();
+
+            if (
+              typeof TAB_CALLBACK ===
+              "function"
+            ) {
+
+              await TAB_CALLBACK(
+                tabId
+              );
+
+            }
+
+          }
+        );
+
+      }
     );
-
-  }
-
-}
-
-/* ==========================================
-   UPDATE ACTIVE STATE
-========================================== */
-
-function updateActiveState() {
-
-  const tabs =
-    document.querySelectorAll(
-      ".tab-button"
-    );
-
-  tabs.forEach(
-    tab => {
-
-      const reportId =
-        tab.dataset.report;
-
-      tab.classList.toggle(
-        "active",
-        reportId ===
-          activeTab
-      );
-
-    }
-  );
-
-}
-
-/* ==========================================
-   TAB CHANGE LISTENER
-========================================== */
-
-export function onTabChange(
-  callback
-) {
-
-  tabChangeHandler =
-    callback;
-
-}
-
-/* ==========================================
-   GET ACTIVE TAB
-========================================== */
-
-export function getActiveTab() {
-
-  return activeTab;
-
-}
-
-/* ==========================================
-   RESET
-========================================== */
-
-export function resetTabs() {
-
-  activeTab =
-    DEFAULT_REPORT;
-
-  updateActiveState();
 
 }
